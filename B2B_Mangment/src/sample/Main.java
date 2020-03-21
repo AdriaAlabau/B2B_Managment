@@ -19,13 +19,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseButton;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Main extends Application {
     private GridPane grid;
 
 
-   public class ShapeHelp extends Rectangle {
+    public class ShapeHelp extends Rectangle {
 
         public ShapeHelp(boolean color) {
             setWidth(50);
@@ -50,7 +51,7 @@ public class Main extends Application {
         text.setX(50);
         text.setY(50);
         text.setFill(Color.BROWN);
-        
+
 
         //button.setBackground(Color.BROWN);
 
