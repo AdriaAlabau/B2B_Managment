@@ -1,52 +1,32 @@
-package sample;
+package TFG_project;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.*;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.input.MouseButton;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class Main extends Application {
-    private GridPane grid;
 
 
-    public class ShapeHelp extends Rectangle {
-
-        public ShapeHelp(boolean color) {
-            setWidth(50);
-            setHeight(30);
-
-            Color col = color ? Color.BLUE.deriveColor(0, 1.2, 1, 0.6) : Color.DARKBLUE.deriveColor(0, 1.2, 1, 0.6);
-            Color secCol = color ? Color.BLUE : Color.DARKBLUE;
-            setFill(col);
-            setStroke(secCol);
-        }
+    public static void main(String[] args) {
+        launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        Parent root = FXMLLoader.load(getClass().getResource("first_screen.fxml"));
+        primaryStage.setTitle("B2B_Managment");
+        primaryStage.setScene(new Scene(root, 350, 250));
         primaryStage.show();
-        /*primaryStage.setTitle("TFG PRIMERA PROVA");
+
+    }
+
+
+
+}
+
+/*primaryStage.setTitle("TFG PRIMERA PROVA");
 
 
         Text text = new Text();
@@ -110,10 +90,3 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();*/
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-}
