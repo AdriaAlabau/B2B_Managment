@@ -19,7 +19,6 @@ public class Main extends Application {
         primaryStage.setTitle("B2B_Managment");
         primaryStage.setScene(new Scene(root, 350, 250));
         primaryStage.show();
-
     }
 
 
