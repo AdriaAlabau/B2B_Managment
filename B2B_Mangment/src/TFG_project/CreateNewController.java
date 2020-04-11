@@ -5,7 +5,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.LinkedList;
@@ -24,6 +26,8 @@ public class CreateNewController {
     private TextField numberOfEntities;
     @FXML
     private Button generateButton;
+    @FXML
+    private Button addMeetingButton;
 
     @FXML
     private Button saveButton;
@@ -43,11 +47,10 @@ public class CreateNewController {
     @FXML
     private ChoiceBox newEntityEntrance;
     @FXML
-    private TextField newEntityMeeting1;
-    @FXML
-    private HBox newMettingsGroup;
+    private GridPane newMettingsGroup;
 
     private LinkedList<TextField> extraMeetings;
+    private LinkedList<Label> extraLabels;
 
 
     private ObservableList<Entity> arrayEntity= FXCollections.observableArrayList();
@@ -56,6 +59,12 @@ public class CreateNewController {
     {
         //
         extraMeetings = new LinkedList<>();
+        extraLabels = new LinkedList<>();
+    }
+
+    @FXML
+    protected void initialize() {
+        addNewMeeting();
     }
 
     public void generateTable() throws Exception
@@ -76,14 +85,18 @@ public class CreateNewController {
     public void addNewMeeting()
     {
         TextField newTF = new TextField("");
-        newTF.setPromptText("Meeting Entity Id...");
+        newTF.setPromptText("Set Entity Id...");
+        Label newLabel = new Label(String.valueOf(newMettingsGroup.getRowCount()+1) + ".");
         extraMeetings.add(newTF);
-        newMettingsGroup.getChildren().add(extraMeetings.size(),newTF);
+        extraLabels.add(newLabel);
+        int rowCount = newMettingsGroup.getRowCount();
+        newMettingsGroup.add(newLabel, 0, rowCount);
+        newMettingsGroup.add(newTF, 1, rowCount);
     }
 
     public void addEntityToTable()
     {
-        Entity ent = new Entity();
+        /*Entity ent = new Entity();
 
         ent.setId(newEntityId.getText());
         newEntityId.setText("");
@@ -95,19 +108,18 @@ public class CreateNewController {
         newEntityNumber.setText("");
 
         ent.setEntrance((String) newEntityEntrance.getValue());
-        newEntityEntrance.setValue("00:00");
+        newEntityEntrance.setValue("00:00");*/
 
-        ent.addMetting(newEntityMeeting1.getText());
-        newEntityMeeting1.setText("");
-
-        for (TextField ttt : extraMeetings) {
-            ent.addMetting(ttt.getText());
-            newMettingsGroup.getChildren().remove(ttt);
+        for (int i = extraMeetings.size()-1; i>0; i--){
+            //ent.addMetting(ttt.getText());
+            newMettingsGroup.getChildren().remove(extraMeetings.get(i));
+            newMettingsGroup.getChildren().remove(extraLabels.get(i));
         }
 
-        extraMeetings.clear();
+        extraMeetings.subList(1,extraMeetings.size()).clear();
+        extraLabels.subList(1,extraLabels.size()).clear();
 
-        arrayEntity.add(ent);
-        entityTable.setItems(arrayEntity);
+       // arrayEntity.add(ent);
+        //entityTable.setItems(arrayEntity);
     }
 }
