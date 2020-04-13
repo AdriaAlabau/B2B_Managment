@@ -5,12 +5,17 @@ import TFG_project.Entities.MainData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class CreateNewController {
@@ -88,7 +93,19 @@ public class CreateNewController {
     {
         if(MainData.SharedInstance().getNSessions() >0)
         {
+            Stage setUpSessions = new Stage();
+            setUpSessions.initModality(Modality.APPLICATION_MODAL);
+            setUpSessions.initOwner(eventName.getScene().getWindow());
+            Parent setUp = null;
+            try {
+                setUp = FXMLLoader.load(getClass().getResource("set_up.fxml"));
+                setUpSessions.setTitle("Set Up Sessions");
+                setUpSessions.setScene(new Scene(setUp, 600, 400));
 
+                setUpSessions.show();
+            } catch (IOException e) {
+                int x = 0;
+            }
         }
         else
         {

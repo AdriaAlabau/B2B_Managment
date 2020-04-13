@@ -9,7 +9,7 @@ public class MainData {
     private String eventName;
     private String eventLocation;
     private int nSessions;
-    private List<Sessio> sessions;
+    private LinkedList<Sessio> sessions;
 
     public static MainData SharedInstance()
     {
@@ -22,7 +22,6 @@ public class MainData {
     private MainData()
     {
         //inicialitzem
-        sessions = new LinkedList<>();
         nSessions = -1;
         eventName = "";
         eventLocation = "";
@@ -46,5 +45,23 @@ public class MainData {
     public int getNSessions()
     {
         return nSessions;
+    }
+
+    public LinkedList<Sessio> getSessions()
+    {
+        if(sessions == null)
+        {
+            sessions = new LinkedList<>();
+            for(int i = 0; i<nSessions; i++)
+            {
+                sessions.add(new Sessio());
+            }
+        }
+        return sessions;
+    }
+
+    public void setSession(int d, Sessio ses)
+    {
+        sessions.set(d, ses);
     }
 }

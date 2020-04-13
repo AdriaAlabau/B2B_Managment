@@ -6,38 +6,32 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Sessio {
-    private List<SimpleStringProperty> taulesConfig;
-    private SimpleStringProperty horaInici= new SimpleStringProperty("");
-    private SimpleStringProperty horaFi= new SimpleStringProperty("");
+
+    private String horaInici;
+    private String horaFi;
 
     public Sessio()
     {
-        taulesConfig = new LinkedList<>();
+        horaInici = "08:00";
+        horaFi = "20:00";
     }
-
-    public List<SimpleStringProperty> getTaulesConfig() {
-        return taulesConfig;
-    }
-
-    public void addTaulaConfig(String taula) {
-        taulesConfig.add(new SimpleStringProperty(taula));
-    }
-
 
     public String getHoraInici() {
-        return horaInici.get();
+        return horaInici;
     }
 
     public void setHoraInici(String hora) {
-        this.horaInici.set(hora);
+
+        this.horaInici = hora;
     }
 
     public String getHoraFis() {
-        return horaFi.get();
+        return horaFi;
     }
 
     public void setHoraFi(String horaFi) {
-        this.horaFi.set(horaFi);
+
+        this.horaFi = horaFi;
     }
 }
 

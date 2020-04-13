@@ -141,7 +141,7 @@
       </VBox>
    </left>
    <center>
-      <TableView fx:id="entityTable" prefHeight="862.0" prefWidth="904.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="entityTable" cacheShape="false" prefHeight="862.0" prefWidth="904.0" BorderPane.alignment="CENTER">
           <columns>
               <TableColumn prefWidth="100.0" text="ID">
                   <cellValueFactory>

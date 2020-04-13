@@ -87,12 +87,12 @@
                      </VBox.margin>
                      <children>
                         <Label text="Entity Name" />
-                        <Label text="Event ID" GridPane.rowIndex="1" />
+                        <Label prefHeight="23.0" prefWidth="46.0" text="Entity ID" GridPane.rowIndex="1" />
                         <Label text="Number of atendees" GridPane.rowIndex="2" />
                         <TextField fx:id="newEntityName" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" />
-                        <TextField fx:id="newEntityNumber" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Entity Name" />
                         <TextField fx:id="newEntityId" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="newEntityNumber" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
                   <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="342.0" text="Set arribal info">
@@ -141,7 +141,7 @@
       </VBox>
    </left>
    <center>
-      <TableView fx:id="entityTable" prefHeight="862.0" prefWidth="904.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="entityTable" cacheShape="false" prefHeight="862.0" prefWidth="904.0" BorderPane.alignment="CENTER">
           <columns>
               <TableColumn prefWidth="100.0" text="ID">
                   <cellValueFactory>
