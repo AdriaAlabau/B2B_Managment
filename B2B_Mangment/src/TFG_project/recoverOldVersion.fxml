@@ -276,6 +276,11 @@
                </cellValueFactory>
             </TableColumn>
             <TableColumn prefWidth="300.0" text="Meetings">
+                <cellValueFactory>
+                    <PropertyValueFactory property="meetingsString" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="300.0" text="Meetings">
                <cellValueFactory>
                   <PropertyValueFactory property="meetingsString" />
                </cellValueFactory>

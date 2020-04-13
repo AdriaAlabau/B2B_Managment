@@ -1,12 +1,15 @@
 package TFG_project.Entities;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MainData {
 
     private static MainData mainData;
-    private Integer nSessions;
-    private List<Sessio> duradaSessio;
+    private String eventName;
+    private String eventLocation;
+    private int nSessions;
+    private List<Sessio> sessions;
 
     public static MainData SharedInstance()
     {
@@ -19,5 +22,29 @@ public class MainData {
     private MainData()
     {
         //inicialitzem
+        sessions = new LinkedList<>();
+        nSessions = -1;
+        eventName = "";
+        eventLocation = "";
+    }
+
+    public void setEventName(String newName)
+    {
+        eventName = newName;
+    }
+
+    public void setEventLocation(String newLocation)
+    {
+        eventLocation = newLocation;
+    }
+
+    public void setNumberOfSessions(int nSes)
+    {
+        nSessions = nSes;
+    }
+
+    public int getNSessions()
+    {
+        return nSessions;
     }
 }

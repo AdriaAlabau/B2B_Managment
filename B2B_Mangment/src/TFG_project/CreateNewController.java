@@ -1,6 +1,7 @@
 package TFG_project;
 
 import TFG_project.Entities.Entity;
+import TFG_project.Entities.MainData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,28 +15,20 @@ import java.util.LinkedList;
 
 public class CreateNewController {
 
-    @FXML
-    private TextField nTables;
-    @FXML
-    private TextField nDays;
-    @FXML
-    private ChoiceBox hourIniciPicker;
-    @FXML
-    private ChoiceBox hourFiPicker;
-    @FXML
-    private TextField numberOfEntities;
-    @FXML
-    private Button generateButton;
-    @FXML
-    private Button addMeetingButton;
 
     @FXML
-    private Button saveButton;
+    private TextField eventName;
     @FXML
-    private Button endButton;
+    private TextField eventLocation;
+    @FXML
+    private TextField numberOfSessions;
 
     @FXML
-    private TableView entityTable;
+    private Button setUpSessions;
+
+
+
+
 
 
     @FXML
@@ -44,14 +37,18 @@ public class CreateNewController {
     private TextField newEntityName;
     @FXML
     private TextField newEntityNumber;
-    @FXML
-    private ChoiceBox newEntityEntrance;
+
     @FXML
     private GridPane newMettingsGroup;
 
     private LinkedList<TextField> extraMeetings;
     private LinkedList<Label> extraLabels;
 
+    private LinkedList<Integer> sessionsInfo;
+
+
+    @FXML
+    private TableView entityTable;
 
     private ObservableList<Entity> arrayEntity= FXCollections.observableArrayList();
 
@@ -65,12 +62,40 @@ public class CreateNewController {
     @FXML
     protected void initialize() {
         addNewMeeting();
+
+        eventName.textProperty().addListener((observable, oldValue, newValue) -> {
+            MainData.SharedInstance().setEventName(newValue);
+        });
+
+        eventLocation.textProperty().addListener((observable, oldValue, newValue) -> {
+            MainData.SharedInstance().setEventLocation(newValue);
+        });
+
+        numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            try
+            {
+                MainData.SharedInstance().setNumberOfSessions(Integer.parseInt(newValue));
+            }
+            catch (Exception e)
+            {
+                //SHOW alert
+            }
+        });
     }
 
-    public void generateTable() throws Exception
+    public void openSetUpSessions()
     {
-        //Bloquejem el nombre d'entitats i generem el llistat
+        if(MainData.SharedInstance().getNSessions() >0)
+        {
+
+        }
+        else
+        {
+            //TODO Show alert
+        }
     }
+
 
     public void saveFile() throws Exception
     {
@@ -96,30 +121,36 @@ public class CreateNewController {
 
     public void addEntityToTable()
     {
-        /*Entity ent = new Entity();
+        if(MainData.SharedInstance().getNSessions()> 0) {
+            Entity ent = new Entity(MainData.SharedInstance().getNSessions());
 
-        ent.setId(newEntityId.getText());
-        newEntityId.setText("");
+            ent.setId(newEntityId.getText());
+            newEntityId.setText("");
 
-        ent.setName(newEntityName.getText());
-        newEntityName.setText("");
+            ent.setName(newEntityName.getText());
+            newEntityName.setText("");
 
-        ent.setAttendees(newEntityNumber.getText());
-        newEntityNumber.setText("");
+            ent.setAttendees(newEntityNumber.getText());
+            newEntityNumber.setText("");
 
-        ent.setEntrance((String) newEntityEntrance.getValue());
-        newEntityEntrance.setValue("00:00");*/
+            //get
 
-        for (int i = extraMeetings.size()-1; i>0; i--){
-            //ent.addMetting(ttt.getText());
-            newMettingsGroup.getChildren().remove(extraMeetings.get(i));
-            newMettingsGroup.getChildren().remove(extraLabels.get(i));
+            for (int i = extraMeetings.size() - 1; i > 0; i--) {
+                ent.addMetting(extraMeetings.get(i).getText());
+                newMettingsGroup.getChildren().remove(extraMeetings.get(i));
+                newMettingsGroup.getChildren().remove(extraLabels.get(i));
+            }
+
+            extraMeetings.subList(1, extraMeetings.size()).clear();
+            extraLabels.subList(1, extraLabels.size()).clear();
+            extraMeetings.get(0).setText("");
+
+            arrayEntity.add(ent);
+            entityTable.setItems(arrayEntity);
         }
-
-        extraMeetings.subList(1,extraMeetings.size()).clear();
-        extraLabels.subList(1,extraLabels.size()).clear();
-
-       // arrayEntity.add(ent);
-        //entityTable.setItems(arrayEntity);
+        else
+        {
+           // show Alert
+        }
     }
 }
