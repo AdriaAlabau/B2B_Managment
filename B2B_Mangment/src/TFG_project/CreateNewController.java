@@ -100,7 +100,8 @@ public class CreateNewController {
             try {
                 setUp = FXMLLoader.load(getClass().getResource("set_up.fxml"));
                 setUpSessions.setTitle("Set Up Sessions");
-                setUpSessions.setScene(new Scene(setUp, 600, 400));
+                int width = MainData.SharedInstance().getNSessions() * 80+120;
+                setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1700),305));
 
                 setUpSessions.show();
             } catch (IOException e) {
