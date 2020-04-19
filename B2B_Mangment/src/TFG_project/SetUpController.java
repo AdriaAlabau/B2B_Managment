@@ -13,10 +13,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -27,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SetUpController {
+
+    @FXML
+    private VBox mainLayout;
 
     @FXML
     private GridPane sessionsGridPane;
@@ -176,6 +176,10 @@ public class SetUpController {
 
             int j = 3;
             for (TextField t :  auxiliar.tablesConfig) {
+                if(i == 1)
+                {
+                    setNewRowStuff(j,Integer.parseInt(t.getId()));
+                }
                 sessionsGridPane.add(t, i, j);
                 j++;
             }
@@ -207,11 +211,8 @@ public class SetUpController {
             int value = Integer.parseInt(newTableValue.getText());
             if(!tableValues.contains(value))
             {
-                tableValues.add(value);
-                Label label = new Label("N Tables of " + value);
-                label.setFont(Font.font ("System", FontWeight.BOLD, 14));
+                setNewRowStuff(lastGridPos, value);
 
-                sessionsGridPane.add(label, 0,  lastGridPos);
                 int i = 1;
                 for(SessionColumn aux : columns)
                 {
@@ -219,13 +220,37 @@ public class SetUpController {
                     sessionsGridPane.add(aux.getLastTableConfig(),i,lastGridPos);
                     i++;
                 }
+
                 lastGridPos++;
             }
+
         }
         catch(Exception e)
         {
             //TODO SET ALERT
         }
 
+    }
+
+    private void setNewRowStuff(int gridPos, int seats)
+    {
+        tableValues.add(seats);
+        Label label = new Label("N Tables of " + seats);
+        label.setFont(Font.font ("System", FontWeight.BOLD, 14));
+
+        sessionsGridPane.add(label, 0,  gridPos);
+        RowConstraints constr = new RowConstraints(40);
+        sessionsGridPane.getRowConstraints().add(constr);
+
+        try {
+            Stage thisStage = ((Stage) sessionsGridPane.getScene().getWindow());
+
+            thisStage.setHeight(thisStage.getHeight() + 40);
+
+        }
+        catch(Exception e)
+        {
+            //Nothing to do
+        }
     }
 }

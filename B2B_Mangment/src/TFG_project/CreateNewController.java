@@ -1,7 +1,9 @@
 package TFG_project;
 
 import TFG_project.Entities.Entity;
+import TFG_project.Entities.EntityJson;
 import TFG_project.Entities.MainData;
+import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,8 +17,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedList;
+
+
+import java.io.IOException;
+import java.util.Scanner;
 
 public class CreateNewController {
 
@@ -80,7 +86,7 @@ public class CreateNewController {
 
             try
             {
-                MainData.SharedInstance().setNumberOfSessions(Integer.parseInt(newValue));
+                MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
             }
             catch (Exception e)
             {
@@ -101,7 +107,8 @@ public class CreateNewController {
                 setUp = FXMLLoader.load(getClass().getResource("set_up.fxml"));
                 setUpSessions.setTitle("Set Up Sessions");
                 int width = MainData.SharedInstance().getNSessions() * 80+120;
-                setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1700),305));
+                int height = 305 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
+                setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1700),height ));
 
                 setUpSessions.show();
             } catch (IOException e) {
@@ -114,10 +121,46 @@ public class CreateNewController {
         }
     }
 
+    public void loadFile() throws Exception
+    {
+        try{
+            File myObj = new File("/Users/adriaalabau/Projects/TFG/B2B_Mangment/MobileWorldCongres_save.json");
+            Scanner myReader = new Scanner(myObj);
+            String data = "";
+            while (myReader.hasNextLine()) {
+                data += myReader.nextLine();
+            }
+            myReader.close();
+
+            Gson gson = new Gson();
+            MainData.SharedInstance().replaceInfo(gson.fromJson(data, MainData.class));
+            eventName.setText(MainData.SharedInstance().getEventName());
+            eventLocation.setText(MainData.SharedInstance().getEventLocation());
+            numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
+
+            arrayEntity.addAll(MainData.SharedInstance().getEntities());
+            entityTable.setItems(arrayEntity);
+        }
+        catch(Exception e)
+        {
+            int x = 0;
+        }
+    }
 
     public void saveFile() throws Exception
     {
         //Obteim les dades i les guardem en un fitxer
+        try {
+            FileWriter myWriter = new FileWriter(eventName.getText()+ "_save"+".json");
+
+            Gson gson = new Gson();
+            var str = gson.toJson(MainData.SharedInstance());
+            myWriter.write(str);
+            myWriter.close();
+        } catch (IOException e) {
+
+
+        }
     }
 
     public void generateSchedule() throws Exception
@@ -141,6 +184,7 @@ public class CreateNewController {
     {
         if(MainData.SharedInstance().getNSessions()> 0) {
             Entity ent = new Entity(MainData.SharedInstance().getNSessions());
+            EntityJson entJSON = new EntityJson();
 
             ent.setId(newEntityId.getText());
             newEntityId.setText("");
@@ -163,8 +207,11 @@ public class CreateNewController {
             extraLabels.subList(1, extraLabels.size()).clear();
             extraMeetings.get(0).setText("");
 
+            MainData.SharedInstance().setNewEntity(ent);
+
             arrayEntity.add(ent);
             entityTable.setItems(arrayEntity);
+
         }
         else
         {

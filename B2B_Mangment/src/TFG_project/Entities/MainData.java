@@ -10,6 +10,7 @@ public class MainData {
     private String eventLocation;
     private int nSessions;
     private LinkedList<Sessio> sessions;
+    private LinkedList<Entity> entities;
 
     public static MainData SharedInstance()
     {
@@ -19,12 +20,28 @@ public class MainData {
         return mainData;
     }
 
-    private MainData()
+    public MainData()
     {
         //inicialitzem
         nSessions = -1;
         eventName = "";
         eventLocation = "";
+        entities = new LinkedList<>();
+    }
+
+    public void replaceInfo(MainData newMain)
+    {
+        mainData = newMain;
+    }
+
+    public String getEventName()
+    {
+        return  eventName;
+    }
+
+    public String getEventLocation()
+    {
+        return eventLocation;
     }
 
     public void setEventName(String newName)
@@ -37,7 +54,7 @@ public class MainData {
         eventLocation = newLocation;
     }
 
-    public void setNumberOfSessions(int nSes)
+    public void setNSessions(int nSes)
     {
         nSessions = nSes;
     }
@@ -60,8 +77,25 @@ public class MainData {
         return sessions;
     }
 
+    public void setSessions(LinkedList<Sessio> ss)
+    {
+        sessions = ss;
+    }
+
     public void setSession(int d, Sessio ses)
     {
         sessions.set(d, ses);
+    }
+
+    public void setEntities(LinkedList<Entity> newEnt)
+    {
+        entities = newEnt;
+    }
+
+    public LinkedList<Entity> getEntities() {return entities;}
+
+    public void setNewEntity(Entity newEntity)
+    {
+        entities.add(newEntity);
     }
 }
