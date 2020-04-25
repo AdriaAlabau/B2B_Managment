@@ -143,7 +143,7 @@
    <center>
       <TableView fx:id="entityTable" cacheShape="false" prefHeight="862.0" prefWidth="904.0" BorderPane.alignment="CENTER">
           <columns>
-              <TableColumn prefWidth="100.0" text="ID">
+              <TableColumn prefWidth="150.0" text="ID">
                   <cellValueFactory>
                       <PropertyValueFactory property="id" />
                   </cellValueFactory>
@@ -158,12 +158,7 @@
                       <PropertyValueFactory property="attendees" />
                   </cellValueFactory>
               </TableColumn>
-              <TableColumn prefWidth="100.0" text="Entrance hour">
-                  <cellValueFactory>
-                      <PropertyValueFactory property="entrance" />
-                  </cellValueFactory>
-              </TableColumn>
-              <TableColumn prefWidth="300.0" text="Meetings">
+              <TableColumn prefWidth="600.0" text="Meetings">
                   <cellValueFactory>
                       <PropertyValueFactory property="meetingsString" />
                   </cellValueFactory>

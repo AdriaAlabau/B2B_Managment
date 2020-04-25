@@ -1,5 +1,7 @@
 package TFG_project.Entities;
 
+import javafx.collections.ObservableList;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class MainData {
     private String eventLocation;
     private int nSessions;
     private LinkedList<Sessio> sessions;
-    private LinkedList<Entity> entities;
+    private LinkedList<EntityJson> entities;
 
     public static MainData SharedInstance()
     {
@@ -87,14 +89,21 @@ public class MainData {
         sessions.set(d, ses);
     }
 
-    public void setEntities(LinkedList<Entity> newEnt)
+    public void setEntities(ObservableList<Entity> newEnt)
     {
-        entities = newEnt;
+        newEnt.forEach(e -> entities.add(new EntityJson(e)));
     }
 
-    public LinkedList<Entity> getEntities() {return entities;}
+    public LinkedList<Entity> getConvertedEntities()
+    {
+        LinkedList<Entity> lRet = new LinkedList<>();
+        entities.forEach(e -> lRet.add(new Entity(e)));
+        return lRet;
+    }
 
-    public void setNewEntity(Entity newEntity)
+    public LinkedList<EntityJson> getEntities() {return entities;}
+
+    public void setNewEntity(EntityJson newEntity)
     {
         entities.add(newEntity);
     }

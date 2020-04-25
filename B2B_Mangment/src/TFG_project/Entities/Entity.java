@@ -11,18 +11,32 @@ public class Entity {
     private SimpleStringProperty attendees= new SimpleStringProperty("");
     private SimpleStringProperty entrance= new SimpleStringProperty("");
     private SimpleStringProperty meetingsString= new SimpleStringProperty("");
-    private SimpleStringProperty attendingSessionsString= new SimpleStringProperty("");
-    private List<String> listOfMeetings;
-    private List<Boolean> listOfSessions;
+    //private SimpleStringProperty attendingSessionsString= new SimpleStringProperty("");
+    private LinkedList<String> listOfMeetings;
+    private LinkedList<SessioAttending> listOfSessions;
 
-    public Entity(int nDays)
+    public Entity(List<Sessio> days)
     {
         listOfMeetings = new LinkedList<>();
         listOfSessions = new LinkedList<>();
-        for(int i = 0; i<nDays; i++)
+        for(Sessio unit: days)
         {
-            listOfSessions.add(false);
+            listOfSessions.add(new SessioAttending(unit.getHoraInici(), unit.getHoraFis()));
         }
+    }
+
+    public Entity(EntityJson copy)
+    {
+        setId(copy.id);
+        setName(copy.name);
+        setAttendees(copy.attendees);
+        setEntrance(copy.entrance);
+        listOfMeetings = new LinkedList<>();
+        listOfSessions = new LinkedList<>();
+
+        copy.listOfMeetings.forEach(u -> addMetting(u));
+
+        setAttendingSessions(copy.listOfSessions);
     }
 
     public String getId() {
@@ -65,6 +79,20 @@ public class Entity {
         this.meetingsString.set(meetingsString);
     }
 
+    public LinkedList<SessioAttending> getListOfSessions(){
+        return listOfSessions;
+    }
+
+    public LinkedList<String> getListOfMeetings(){
+        return listOfMeetings;
+    }
+
+    public void setAttendingSessions(List<SessioAttending> sessions)
+    {
+        listOfSessions = new LinkedList<>();
+        listOfSessions.addAll(sessions);
+    }
+
     public void addMetting(String met)
     {
 
@@ -73,23 +101,5 @@ public class Entity {
         else
             setMeetingsString(getMeetingsString()  + ", " +met);
         listOfMeetings.add(met);
-    }
-
-    public String getAttendingSessionsString() {
-        return attendingSessionsString.get();
-    }
-
-    public void setAttendingSessionsString(String meetingsString) {
-        this.attendingSessionsString.set(meetingsString);
-    }
-
-    public void addAttendingDay(int day)
-    {
-
-        if(listOfSessions.size() == 0)
-            setAttendingSessionsString(String.valueOf(day+1));
-        else
-            setAttendingSessionsString(getMeetingsString()  + ", " +String.valueOf(day+1));
-        listOfSessions.set(day, Boolean.TRUE);
     }
 }

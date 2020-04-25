@@ -93,6 +93,11 @@ public class CreateNewController {
                 //SHOW alert
             }
         });
+
+        Menu menu = new Menu("File");
+
+
+
     }
 
     public void openSetUpSessions()
@@ -106,8 +111,8 @@ public class CreateNewController {
             try {
                 setUp = FXMLLoader.load(getClass().getResource("set_up.fxml"));
                 setUpSessions.setTitle("Set Up Sessions");
-                int width = MainData.SharedInstance().getNSessions() * 80+120;
-                int height = 305 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
+                int width = MainData.SharedInstance().getNSessions() * 110+120;
+                int height = 345 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
                 setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1700),height ));
 
                 setUpSessions.show();
@@ -124,7 +129,7 @@ public class CreateNewController {
     public void loadFile() throws Exception
     {
         try{
-            File myObj = new File("/Users/adriaalabau/Projects/TFG/B2B_Mangment/MobileWorldCongres_save.json");
+            File myObj = new File("/Users/adriaalabau/Projects/TFG/B2B_Mangment/NewWorld_save.json");
             Scanner myReader = new Scanner(myObj);
             String data = "";
             while (myReader.hasNextLine()) {
@@ -138,7 +143,8 @@ public class CreateNewController {
             eventLocation.setText(MainData.SharedInstance().getEventLocation());
             numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
 
-            arrayEntity.addAll(MainData.SharedInstance().getEntities());
+            arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
+
             entityTable.setItems(arrayEntity);
         }
         catch(Exception e)
@@ -151,6 +157,7 @@ public class CreateNewController {
     {
         //Obteim les dades i les guardem en un fitxer
         try {
+            MainData.SharedInstance().setEntities(arrayEntity);
             FileWriter myWriter = new FileWriter(eventName.getText()+ "_save"+".json");
 
             Gson gson = new Gson();
@@ -183,8 +190,7 @@ public class CreateNewController {
     public void addEntityToTable()
     {
         if(MainData.SharedInstance().getNSessions()> 0) {
-            Entity ent = new Entity(MainData.SharedInstance().getNSessions());
-            EntityJson entJSON = new EntityJson();
+            Entity ent = new Entity(MainData.SharedInstance().getSessions());
 
             ent.setId(newEntityId.getText());
             newEntityId.setText("");
@@ -198,7 +204,9 @@ public class CreateNewController {
             //get
 
             for (int i = extraMeetings.size() - 1; i > 0; i--) {
-                ent.addMetting(extraMeetings.get(i).getText());
+                if(!extraMeetings.get(i).getText().isEmpty()) {
+                    ent.addMetting(extraMeetings.get(i).getText());
+                }
                 newMettingsGroup.getChildren().remove(extraMeetings.get(i));
                 newMettingsGroup.getChildren().remove(extraLabels.get(i));
             }
@@ -206,8 +214,6 @@ public class CreateNewController {
             extraMeetings.subList(1, extraMeetings.size()).clear();
             extraLabels.subList(1, extraLabels.size()).clear();
             extraMeetings.get(0).setText("");
-
-            MainData.SharedInstance().setNewEntity(ent);
 
             arrayEntity.add(ent);
             entityTable.setItems(arrayEntity);

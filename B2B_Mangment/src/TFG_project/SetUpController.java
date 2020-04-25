@@ -14,11 +14,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import javax.tools.Tool;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class SetUpController {
     class SessionColumn
     {
         public Label title;
+        public DatePicker datePicker;
         public ChoiceBox<String> startHour;
         public ChoiceBox<String> endHour;
         public List<TextField> tablesConfig;
@@ -65,6 +68,9 @@ public class SetUpController {
 
             tablesConfig = new LinkedList<>();
 
+            datePicker = new DatePicker();
+            datePicker.setValue(sessio.getDate());
+
             startHour = new ChoiceBox<>(arrayOfStart);
             startHour.setTooltip(new Tooltip("Select Start Hour"));
             startHour.setValue(sessio.getHoraInici());
@@ -74,7 +80,7 @@ public class SetUpController {
                   public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
                       String newValueStr = arrayOfStart.get(newValue.intValue());
 
-                      sessio.setHoraInici(newValueStr);
+                      //sessio.setHoraInici(newValueStr);
                       int index = arrayOfStart.indexOf(newValueStr);
                       int indexLast = arrayOfEnd.indexOf(sessio.getHoraFis());
                       if(index > indexLast)
@@ -92,9 +98,9 @@ public class SetUpController {
                  @Override
                  public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
                      String newValueStr = arrayOfEnd.get(newValue.intValue());
-                     sessio.setHoraFi(newValueStr);
+                     //sessio.setHoraFi(newValueStr);
 
-                     sessio.setHoraInici(newValueStr);
+                     //sessio.setHoraInici(newValueStr);
                      int indexLast = arrayOfEnd.indexOf(newValueStr);
                      int index = arrayOfStart.indexOf(sessio.getHoraInici());
                      if(index > indexLast)
@@ -103,11 +109,29 @@ public class SetUpController {
                      }
                  }
              });
-
             for (Map.Entry me : sessio.getListOfTables().entrySet()) {
                 setNewTableConfig(((int)me.getKey()), ((TableForSession)me.getValue()).nUnits);
             }
 
+        }
+
+        public Sessio saveAndGetSessio()
+        {
+            sessio.setDate(datePicker.getValue());
+            sessio.setHoraFi(endHour.getValue());
+            sessio.setHoraInici(startHour.getValue());
+            for (TextField tf: tablesConfig) {
+                try{
+                    int value = Integer.parseInt(tf.getText());
+                    int pos = Integer.parseInt(tf.getId());
+                    sessio.setNTables(pos, new TableForSession(pos, value));
+                }
+                catch (Exception e)
+                {
+                    //TODO SHOW SOME ALERT MAYBE PUT RED AND UNDO WHEN VALUE CHECK TRUE
+                }
+            }
+            return sessio;
         }
 
         public Sessio getSessio()
@@ -129,17 +153,17 @@ public class SetUpController {
 
                     try{
                         int value = Integer.parseInt(newValue);
-                        int pos = Integer.parseInt(tf.getId());
-                        sessio.setNTables(pos, new TableForSession(pos, value));
+                        //tf.setBackground(new Background(new BackgroundFill(Color.rgb(255, 255, 255), CornerRadii.EMPTY, tf.getBackground().getOutsets())));
+                        //sessio.setNTables(pos, new TableForSession(pos, value));
                     }
                     catch (Exception e)
                     {
-                        //TODO SHOW SOME ALERT MAYBE PUT RED AND UNDO WHEN VALUE CHECK TRUE
+                        //tf.setBackground(new Background(new BackgroundFill(Color.rgb(250,128,114), CornerRadii.EMPTY, tf.getBackground().getOutsets())));
                     }
                 }
             });
             tablesConfig.add(tf);
-            sessio.setNTables(nSeats, new TableForSession(nSeats, value));
+            //sessio.setNTables(nSeats, new TableForSession(nSeats, value));
         }
 
         public TextField getLastTableConfig()
@@ -171,10 +195,11 @@ public class SetUpController {
             }
             SessionColumn auxiliar = new SessionColumn(i, ses);
             sessionsGridPane.add(auxiliar.title, i, 0);
-            sessionsGridPane.add(auxiliar.startHour, i, 1);
-            sessionsGridPane.add(auxiliar.endHour, i, 2);
+            sessionsGridPane.add(auxiliar.datePicker, i, 1);
+            sessionsGridPane.add(auxiliar.startHour, i, 2);
+            sessionsGridPane.add(auxiliar.endHour, i, 3);
 
-            int j = 3;
+            int j = 4;
             for (TextField t :  auxiliar.tablesConfig) {
                 if(i == 1)
                 {
@@ -184,7 +209,7 @@ public class SetUpController {
                 j++;
             }
             lastGridPos = j;
-            ColumnConstraints constr = new ColumnConstraints(80);
+            ColumnConstraints constr = new ColumnConstraints(110);
             constr.setHalignment(HPos.CENTER);
 
             sessionsGridPane.getColumnConstraints().add(constr);
@@ -198,7 +223,7 @@ public class SetUpController {
     {
         for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
         {
-            MainData.SharedInstance().setSession(i, columns.get(i).getSessio());
+            MainData.SharedInstance().setSession(i, columns.get(i).saveAndGetSessio());
         }
         Stage stage = (Stage) sessionsGridPane.getScene().getWindow();
         // do what you have to do
@@ -209,7 +234,7 @@ public class SetUpController {
     {
         try{
             int value = Integer.parseInt(newTableValue.getText());
-            if(!tableValues.contains(value))
+            if(value > 0 && !tableValues.contains(value))
             {
                 setNewRowStuff(lastGridPos, value);
 
@@ -227,7 +252,19 @@ public class SetUpController {
         }
         catch(Exception e)
         {
-            //TODO SET ALERT
+            if(newTableValue.getText().equals("*")) {
+                setNewRowStuff(lastGridPos, 0);
+
+                int i = 1;
+                for(SessionColumn aux : columns)
+                {
+                    aux.setNewTableConfig(0,0);
+                    sessionsGridPane.add(aux.getLastTableConfig(),i,lastGridPos);
+                    i++;
+                }
+
+                lastGridPos++;
+            }
         }
 
     }
@@ -235,7 +272,7 @@ public class SetUpController {
     private void setNewRowStuff(int gridPos, int seats)
     {
         tableValues.add(seats);
-        Label label = new Label("N Tables of " + seats);
+        Label label = new Label("N Tables of " + (seats == 0 ? "N" : seats));
         label.setFont(Font.font ("System", FontWeight.BOLD, 14));
 
         sessionsGridPane.add(label, 0,  gridPos);
