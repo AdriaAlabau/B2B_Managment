@@ -11,20 +11,31 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.jar.JarFile;
+import javax.swing.JFileChooser;
 
-public class CreateNewController {
+public class CreateNewController extends JFrame {
 
 
     @FXML
@@ -129,23 +140,38 @@ public class CreateNewController {
     public void loadFile() throws Exception
     {
         try{
-            File myObj = new File("/Users/adriaalabau/Projects/TFG/B2B_Mangment/NewWorld_save.json");
-            Scanner myReader = new Scanner(myObj);
-            String data = "";
-            while (myReader.hasNextLine()) {
-                data += myReader.nextLine();
+
+            FileChooser fileChooser = new FileChooser();
+            File file  = fileChooser.showOpenDialog(eventName.getScene().getWindow());
+
+            if (file != null) {
+
+                //This is where a real application would open the file.
+                try {
+
+                    Scanner myReader = new Scanner(file);
+                    String data = "";
+                    while (myReader.hasNextLine()) {
+                        data += myReader.nextLine();
+                    }
+                    myReader.close();
+
+                    Gson gson = new Gson();
+                    MainData.SharedInstance().replaceInfo(gson.fromJson(data, MainData.class));
+                    eventName.setText(MainData.SharedInstance().getEventName());
+                    eventLocation.setText(MainData.SharedInstance().getEventLocation());
+                    numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
+
+                    arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
+
+                    entityTable.setItems(arrayEntity);
+                }
+                catch(Exception e)
+                {
+                    //BAD FORMAT FILE
+                }
             }
-            myReader.close();
 
-            Gson gson = new Gson();
-            MainData.SharedInstance().replaceInfo(gson.fromJson(data, MainData.class));
-            eventName.setText(MainData.SharedInstance().getEventName());
-            eventLocation.setText(MainData.SharedInstance().getEventLocation());
-            numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
-
-            arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
-
-            entityTable.setItems(arrayEntity);
         }
         catch(Exception e)
         {
@@ -156,16 +182,30 @@ public class CreateNewController {
     public void saveFile() throws Exception
     {
         //Obteim les dades i les guardem en un fitxer
+
+
         try {
-            MainData.SharedInstance().setEntities(arrayEntity);
-            FileWriter myWriter = new FileWriter(eventName.getText()+ "_save"+".json");
+            DirectoryChooser fileChooser = new DirectoryChooser();
+            File file  = fileChooser.showDialog(eventName.getScene().getWindow());
 
-            Gson gson = new Gson();
-            var str = gson.toJson(MainData.SharedInstance());
-            myWriter.write(str);
-            myWriter.close();
-        } catch (IOException e) {
+            if (file != null) {
 
+                String dir = file.getAbsolutePath();
+                //This is where a real application would open the file.
+
+                MainData.SharedInstance().setEntities(arrayEntity);
+
+                var path = Paths.get(dir, eventName.getText() + "_save" + ".json");
+                FileWriter myWriter = new FileWriter(path.toString());
+
+                Gson gson = new Gson();
+                var str = gson.toJson(MainData.SharedInstance());
+                myWriter.write(str);
+                myWriter.close();
+            }
+
+        } catch (Exception e) {
+            int x = 0;
 
         }
     }
