@@ -1,9 +1,10 @@
-package TFG_project;
+package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.Entity;
 import TFG_project.Entities.MainData;
 import TFG_project.Entities.Sessio;
 import TFG_project.Entities.TableForSession;
+import TFG_project.HELPERS.Constants;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -36,16 +37,6 @@ public class SetUpController {
     @FXML
     private TextField newTableValue;
 
-    private ObservableList<String> arrayOfEnd = FXCollections.observableArrayList( "00:30", "01:00", "01:30","02:00","02:30",
-            "03:00","03:30", "04:00","04:30","05:00","05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00", "09:30", "10:00", "10:30",
-            "11:00","11:30", "12:00","12:30", "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30", "18:00","18:30",
-            "19:00", "19:30", "20:00", "20:30", "21:00","21:30", "22:00","22:30", "23:00", "23:30","23:59");
-
-    private ObservableList<String> arrayOfStart = FXCollections.observableArrayList("00:00", "00:30", "01:00", "01:30","02:00","02:30",
-            "03:00","03:30", "04:00","04:30","05:00","05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00", "09:30", "10:00", "10:30",
-            "11:00","11:30", "12:00","12:30", "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30", "18:00","18:30",
-            "19:00", "19:30", "20:00", "20:30", "21:00","21:30", "22:00","22:30", "23:00", "23:30");
-
     private int lastGridPos = 3;
 
     private LinkedList<Integer> tableValues;
@@ -71,41 +62,41 @@ public class SetUpController {
             datePicker = new DatePicker();
             datePicker.setValue(sessio.getDate());
 
-            startHour = new ChoiceBox<>(arrayOfStart);
+            startHour = new ChoiceBox<>(Constants.ARRAYOFSTART);
             startHour.setTooltip(new Tooltip("Select Start Hour"));
             startHour.setValue(sessio.getHoraInici());
             startHour.getSelectionModel().selectedIndexProperty().addListener(new
               ChangeListener<Number>() {
                   @Override
                   public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                      String newValueStr = arrayOfStart.get(newValue.intValue());
+                      String newValueStr = Constants.ARRAYOFSTART.get(newValue.intValue());
 
                       //sessio.setHoraInici(newValueStr);
-                      int index = arrayOfStart.indexOf(newValueStr);
-                      int indexLast = arrayOfEnd.indexOf(sessio.getHoraFis());
+                      int index = Constants.ARRAYOFSTART.indexOf(newValueStr);
+                      int indexLast = Constants.ARRAYOFEND.indexOf(sessio.getHoraFis());
                       if(index > indexLast)
                       {
-                          endHour.setValue(arrayOfEnd.get(index));
+                          endHour.setValue(Constants.ARRAYOFEND.get(index));
                       }
                   }
               });
 
-            endHour = new ChoiceBox<>(arrayOfEnd);
+            endHour = new ChoiceBox<>(Constants.ARRAYOFEND);
             endHour.setTooltip(new Tooltip("Select End Hour"));
             endHour.setValue(sessio.getHoraFis());
             endHour.getSelectionModel().selectedIndexProperty().addListener(new
              ChangeListener<Number>() {
                  @Override
                  public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                     String newValueStr = arrayOfEnd.get(newValue.intValue());
+                     String newValueStr = Constants.ARRAYOFEND.get(newValue.intValue());
                      //sessio.setHoraFi(newValueStr);
 
                      //sessio.setHoraInici(newValueStr);
-                     int indexLast = arrayOfEnd.indexOf(newValueStr);
-                     int index = arrayOfStart.indexOf(sessio.getHoraInici());
+                     int indexLast = Constants.ARRAYOFEND.indexOf(newValueStr);
+                     int index = Constants.ARRAYOFSTART.indexOf(sessio.getHoraInici());
                      if(index > indexLast)
                      {
-                         startHour.setValue(arrayOfStart.get(indexLast));
+                         startHour.setValue(Constants.ARRAYOFSTART.get(indexLast));
                      }
                  }
              });

@@ -59,6 +59,18 @@ public class MainData {
     public void setNSessions(int nSes)
     {
         nSessions = nSes;
+        if(sessions != null && sessions.size() > nSes) {
+            for (int i = sessions.size(); i > nSes; i--) {
+                sessions.removeLast();
+            }
+        }
+        else if(sessions != null && sessions.size() < nSes)
+        {
+            for(int i = sessions.size(); i<nSes; i++)
+            {
+                sessions.add(new Sessio());
+            }
+        }
     }
 
     public int getNSessions()

@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CreateNewController">
+<BorderPane prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.CreateNewController">
    <top>
       <VBox prefHeight="39.0" prefWidth="1300.0" BorderPane.alignment="CENTER">
          <children>
@@ -95,7 +95,7 @@
                         <TextField fx:id="newEntityNumber" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
-                  <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="342.0" text="Set arribal info">
+                  <Button mnemonicParsing="false" onAction="#setArribalInfo" prefHeight="27.0" prefWidth="342.0" text="Set arribal info">
                      <VBox.margin>
                         <Insets bottom="5.0" left="30.0" right="30.0" top="5.0" />
                      </VBox.margin>

@@ -1,7 +1,6 @@
-package TFG_project;
+package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.Entity;
-import TFG_project.Entities.EntityJson;
 import TFG_project.Entities.MainData;
 import com.google.gson.Gson;
 import javafx.collections.FXCollections;
@@ -13,18 +12,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -32,8 +27,6 @@ import java.util.LinkedList;
 
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.jar.JarFile;
-import javax.swing.JFileChooser;
 
 public class CreateNewController extends JFrame {
 
@@ -47,10 +40,6 @@ public class CreateNewController extends JFrame {
 
     @FXML
     private Button setUpSessions;
-
-
-
-
 
 
     @FXML
@@ -73,6 +62,8 @@ public class CreateNewController extends JFrame {
     private TableView entityTable;
 
     private ObservableList<Entity> arrayEntity= FXCollections.observableArrayList();
+
+    private Entity currentEntity;
 
     public CreateNewController()
     {
@@ -101,14 +92,12 @@ public class CreateNewController extends JFrame {
             }
             catch (Exception e)
             {
+                int x = 0;
                 //SHOW alert
             }
         });
 
-        Menu menu = new Menu("File");
-
-
-
+        //Menu menu = new Menu("File");
     }
 
     public void openSetUpSessions()
@@ -120,7 +109,7 @@ public class CreateNewController extends JFrame {
             setUpSessions.initOwner(eventName.getScene().getWindow());
             Parent setUp = null;
             try {
-                setUp = FXMLLoader.load(getClass().getResource("set_up.fxml"));
+                setUp = FXMLLoader.load(getClass().getResource("../FXML/set_up.fxml"));
                 setUpSessions.setTitle("Set Up Sessions");
                 int width = MainData.SharedInstance().getNSessions() * 110+120;
                 int height = 345 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
@@ -227,25 +216,67 @@ public class CreateNewController extends JFrame {
         newMettingsGroup.add(newTF, 1, rowCount);
     }
 
+    public void setArribalInfo()
+    {
+        if(MainData.SharedInstance().getNSessions() >0)
+        {
+            if(currentEntity == null)
+                currentEntity= new Entity(MainData.SharedInstance().getSessions());
+            else
+                currentEntity.checkSessionsIntegrity(MainData.SharedInstance().getSessions());
+
+            Stage setUpAttendance = new Stage();
+            setUpAttendance.initModality(Modality.APPLICATION_MODAL);
+            setUpAttendance.initOwner(eventName.getScene().getWindow());
+
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/set_arribal_info.fxml"));
+                Parent root = (Parent)fxmlLoader.load();
+                SetArribalInfo controller = fxmlLoader.<SetArribalInfo>getController();
+                controller.setEntity(currentEntity, MainData.SharedInstance().getSessions());
+
+
+                int width = MainData.SharedInstance().getNSessions() * 110+120;
+                int height = 260;
+                Scene scene = new Scene(root, Math.min(Math.max(width,350), 1700),height );
+
+                setUpAttendance.setScene(scene);
+
+                setUpAttendance.show();
+
+            } catch (IOException e) {
+                int x = 0;
+            }
+        }
+        else
+        {
+            //TODO Show alert
+        }
+    }
+
     public void addEntityToTable()
     {
         if(MainData.SharedInstance().getNSessions()> 0) {
-            Entity ent = new Entity(MainData.SharedInstance().getSessions());
 
-            ent.setId(newEntityId.getText());
+            if(currentEntity == null)
+                currentEntity= new Entity(MainData.SharedInstance().getSessions());
+            else
+                currentEntity.checkSessionsIntegrity(MainData.SharedInstance().getSessions());
+
+            currentEntity.setId(newEntityId.getText());
             newEntityId.setText("");
 
-            ent.setName(newEntityName.getText());
+            currentEntity.setName(newEntityName.getText());
             newEntityName.setText("");
 
-            ent.setAttendees(newEntityNumber.getText());
+            currentEntity.setAttendees(newEntityNumber.getText());
             newEntityNumber.setText("");
 
             //get
 
             for (int i = extraMeetings.size() - 1; i > 0; i--) {
                 if(!extraMeetings.get(i).getText().isEmpty()) {
-                    ent.addMetting(extraMeetings.get(i).getText());
+                    currentEntity.addMetting(extraMeetings.get(i).getText());
                 }
                 newMettingsGroup.getChildren().remove(extraMeetings.get(i));
                 newMettingsGroup.getChildren().remove(extraLabels.get(i));
@@ -255,9 +286,9 @@ public class CreateNewController extends JFrame {
             extraLabels.subList(1, extraLabels.size()).clear();
             extraMeetings.get(0).setText("");
 
-            arrayEntity.add(ent);
+            arrayEntity.add(currentEntity);
             entityTable.setItems(arrayEntity);
-
+            currentEntity = null;
         }
         else
         {

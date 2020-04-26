@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: lightgrey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.FirstSceenController">
+<VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: lightgrey;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.FirstSceenController">
    <children>
       <Button fx:id="buttonCreate" blendMode="DARKEN" mnemonicParsing="false" onAction="#buttonCreateNew" style="-fx-background-color: transparent;" text="Create New Schedule" textFill="#002454">
          <font>

@@ -1,6 +1,8 @@
-package TFG_project
-
-import scala.jdk.CollectionConverters._;
+package TFG_project.SCALA
+import collection.mutable._
+import collection.mutable._
+import collection.JavaConverters._
+import collection.JavaConverters._
 
 object Helper {
   def doSomething() = "This is a sample text obtained";

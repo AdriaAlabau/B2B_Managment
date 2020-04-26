@@ -102,4 +102,28 @@ public class Entity {
             setMeetingsString(getMeetingsString()  + ", " +met);
         listOfMeetings.add(met);
     }
+
+    public void checkSessionsIntegrity(LinkedList<Sessio> sessions)
+    {
+        int i = 0;
+        for(Sessio ses : sessions)
+        {
+            if(listOfSessions.size() >i)
+            {
+                var current = listOfSessions.get(i);
+                current.compareStart(ses.getHoraInici());
+                current.compareEnd(ses.getHoraFis());
+            }
+            else
+            {
+                listOfSessions.add(new SessioAttending(ses.getHoraInici(),ses.getHoraFis()));
+            }
+            i++;
+        }
+        if(listOfSessions.size() >i) {
+            for (int j = listOfSessions.size(); j > i; j--) {
+                listOfSessions.removeLast();
+            }
+        }
+    }
 }
