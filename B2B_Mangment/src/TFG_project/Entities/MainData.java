@@ -10,6 +10,7 @@ public class MainData {
     private static MainData mainData;
     private String eventName;
     private String eventLocation;
+    private int meetingsDuration;
     private int nSessions;
     private LinkedList<Sessio> sessions;
     private LinkedList<EntityJson> entities;
@@ -55,6 +56,13 @@ public class MainData {
     {
         eventLocation = newLocation;
     }
+
+    public void setMeetingsDuration(int newDuration)
+    {
+        meetingsDuration = newDuration;
+    }
+
+    public int getMeetingsDuration() { return meetingsDuration; }
 
     public void setNSessions(int nSes)
     {
@@ -103,6 +111,7 @@ public class MainData {
 
     public void setEntities(ObservableList<Entity> newEnt)
     {
+        entities.clear();
         newEnt.forEach(e -> entities.add(new EntityJson(e)));
     }
 

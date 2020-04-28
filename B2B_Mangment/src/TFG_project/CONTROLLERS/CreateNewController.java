@@ -2,7 +2,10 @@ package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.Entity;
 import TFG_project.Entities.MainData;
+import TFG_project.HELPERS.Constants;
 import com.google.gson.Gson;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -48,6 +51,8 @@ public class CreateNewController extends JFrame {
     private TextField newEntityName;
     @FXML
     private TextField newEntityNumber;
+    @FXML
+    private ChoiceBox meetingDurationChoiceBox;
 
     @FXML
     private GridPane newMettingsGroup;
@@ -96,6 +101,19 @@ public class CreateNewController extends JFrame {
                 //SHOW alert
             }
         });
+        meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
+        meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
+        meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
+          ChangeListener<Number>() {
+              @Override
+              public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
+                  String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
+
+                  //sessio.setHoraInici(newValueStr);
+                  var arry = newValueStr.split(" ");
+                  MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
+              }
+          });
 
         //Menu menu = new Menu("File");
     }
@@ -150,9 +168,11 @@ public class CreateNewController extends JFrame {
                     eventName.setText(MainData.SharedInstance().getEventName());
                     eventLocation.setText(MainData.SharedInstance().getEventLocation());
                     numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
+                    meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
 
+                    arrayEntity.clear();
                     arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
-
+    
                     entityTable.setItems(arrayEntity);
                 }
                 catch(Exception e)

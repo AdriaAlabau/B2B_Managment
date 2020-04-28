@@ -243,7 +243,7 @@ public class SetUpController {
         }
         catch(Exception e)
         {
-            if(newTableValue.getText().equals("*")) {
+            if(newTableValue.getText().equals("*") && !tableValues.contains(0)) {
                 setNewRowStuff(lastGridPos, 0);
 
                 int i = 1;
