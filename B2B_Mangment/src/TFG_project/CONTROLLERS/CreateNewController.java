@@ -2,6 +2,7 @@ package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.Entity;
 import TFG_project.Entities.MainData;
+import TFG_project.Entities.Meeting;
 import TFG_project.HELPERS.Constants;
 import com.google.gson.Gson;
 import javafx.beans.value.ChangeListener;
@@ -33,27 +34,31 @@ import java.util.Scanner;
 
 public class CreateNewController extends JFrame {
 
-
+    //MAIN PART
     @FXML
     private TextField eventName;
     @FXML
     private TextField eventLocation;
     @FXML
     private TextField numberOfSessions;
-
+    @FXML
+    private ChoiceBox meetingDurationChoiceBox;
     @FXML
     private Button setUpSessions;
 
-
+    //ENTITIES
     @FXML
     private TextField newEntityId;
     @FXML
     private TextField newEntityName;
     @FXML
     private TextField newEntityNumber;
-    @FXML
-    private ChoiceBox meetingDurationChoiceBox;
 
+
+
+    //MEETINGS
+    @FXML
+    private ChoiceBox preferedSessionChoiceBox;
     @FXML
     private GridPane newMettingsGroup;
 
@@ -62,13 +67,22 @@ public class CreateNewController extends JFrame {
 
     private LinkedList<Integer> sessionsInfo;
 
+    public static ObservableList<String> ListOfSessions = FXCollections.observableArrayList("All");
+
 
     @FXML
     private TableView entityTable;
 
+    @FXML
+    private TableView meetingsTableView;
+
     private ObservableList<Entity> arrayEntity= FXCollections.observableArrayList();
+    private ObservableList<Meeting> arrayMeetings= FXCollections.observableArrayList();
+
+
 
     private Entity currentEntity;
+    private Meeting currentMeeting;
 
     public CreateNewController()
     {
@@ -79,6 +93,7 @@ public class CreateNewController extends JFrame {
 
     @FXML
     protected void initialize() {
+        addNewMeeting();
         addNewMeeting();
 
         eventName.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -94,6 +109,16 @@ public class CreateNewController extends JFrame {
             try
             {
                 MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
+
+                int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
+
+                ListOfSessions.subList(1, ListOfSessions.size()).clear();
+                for(int i = 0; i< Integer.parseInt(newValue); i++)
+                {
+                    ListOfSessions.add("Session " + String.valueOf(i+1));
+                }
+                preferedSessionChoiceBox.setItems(ListOfSessions);
+                preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
             }
             catch (Exception e)
             {
@@ -114,6 +139,9 @@ public class CreateNewController extends JFrame {
                   MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
               }
           });
+
+        preferedSessionChoiceBox.setItems(ListOfSessions);
+        preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
 
         //Menu menu = new Menu("File");
     }
@@ -172,8 +200,12 @@ public class CreateNewController extends JFrame {
 
                     arrayEntity.clear();
                     arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
+
+                    arrayMeetings.clear();
+                    arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
     
                     entityTable.setItems(arrayEntity);
+                    meetingsTableView.setItems(arrayMeetings);
                 }
                 catch(Exception e)
                 {
@@ -203,6 +235,7 @@ public class CreateNewController extends JFrame {
                 //This is where a real application would open the file.
 
                 MainData.SharedInstance().setEntities(arrayEntity);
+                MainData.SharedInstance().setMeetingJson(arrayMeetings);
 
                 var path = Paths.get(dir, eventName.getText() + "_save" + ".json");
                 FileWriter myWriter = new FileWriter(path.toString());
@@ -292,20 +325,6 @@ public class CreateNewController extends JFrame {
             currentEntity.setAttendees(newEntityNumber.getText());
             newEntityNumber.setText("");
 
-            //get
-
-            for (int i = extraMeetings.size() - 1; i > 0; i--) {
-                if(!extraMeetings.get(i).getText().isEmpty()) {
-                    currentEntity.addMetting(extraMeetings.get(i).getText());
-                }
-                newMettingsGroup.getChildren().remove(extraMeetings.get(i));
-                newMettingsGroup.getChildren().remove(extraLabels.get(i));
-            }
-
-            extraMeetings.subList(1, extraMeetings.size()).clear();
-            extraLabels.subList(1, extraLabels.size()).clear();
-            extraMeetings.get(0).setText("");
-
             arrayEntity.add(currentEntity);
             entityTable.setItems(arrayEntity);
             currentEntity = null;
@@ -315,4 +334,46 @@ public class CreateNewController extends JFrame {
            // show Alert
         }
     }
+
+    public void addMeetingToTable()
+    {
+        int correct = 0;
+        int pos = 0;
+        while(correct < 2 && pos < extraMeetings.size())
+        {
+            if(!extraMeetings.get(pos).getText().isEmpty())
+                correct++;
+            pos++;
+        }
+        if(correct>= 2) {
+            if (currentMeeting == null)
+                currentMeeting = new Meeting();
+
+            currentMeeting.setSessio((String) preferedSessionChoiceBox.getValue());
+            preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
+
+            //get
+
+            for (int i = extraMeetings.size() - 1; i >= 0; i--) {
+                if (!extraMeetings.get(i).getText().isEmpty()) {
+                    currentMeeting.addMetting(extraMeetings.get(i).getText());
+                }
+                if(i>1) {
+                    newMettingsGroup.getChildren().remove(extraMeetings.get(i));
+                    newMettingsGroup.getChildren().remove(extraLabels.get(i));
+                }
+            }
+
+            extraMeetings.subList(2, extraMeetings.size()).clear();
+            extraLabels.subList(2, extraLabels.size()).clear();
+            extraMeetings.get(0).setText("");
+            extraMeetings.get(1).setText("");
+
+            arrayMeetings.add(currentMeeting);
+            meetingsTableView.setItems(arrayMeetings);
+            currentMeeting = null;
+        }
+    }
+
+
 }

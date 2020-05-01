@@ -10,14 +10,11 @@ public class Entity {
     private SimpleStringProperty name = new SimpleStringProperty("");
     private SimpleStringProperty attendees= new SimpleStringProperty("");
     private SimpleStringProperty entrance= new SimpleStringProperty("");
-    private SimpleStringProperty meetingsString= new SimpleStringProperty("");
     //private SimpleStringProperty attendingSessionsString= new SimpleStringProperty("");
-    private LinkedList<String> listOfMeetings;
     private LinkedList<SessioAttending> listOfSessions;
 
     public Entity(List<Sessio> days)
     {
-        listOfMeetings = new LinkedList<>();
         listOfSessions = new LinkedList<>();
         for(Sessio unit: days)
         {
@@ -31,10 +28,7 @@ public class Entity {
         setName(copy.name);
         setAttendees(copy.attendees);
         setEntrance(copy.entrance);
-        listOfMeetings = new LinkedList<>();
         listOfSessions = new LinkedList<>();
-
-        copy.listOfMeetings.forEach(u -> addMetting(u));
 
         setAttendingSessions(copy.listOfSessions);
     }
@@ -71,36 +65,13 @@ public class Entity {
         this.entrance.set(entrance);
     }
 
-    public String getMeetingsString() {
-        return meetingsString.get();
-    }
-
-    public void setMeetingsString(String meetingsString) {
-        this.meetingsString.set(meetingsString);
-    }
-
     public LinkedList<SessioAttending> getListOfSessions(){
         return listOfSessions;
     }
-
-    public LinkedList<String> getListOfMeetings(){
-        return listOfMeetings;
-    }
-
     public void setAttendingSessions(List<SessioAttending> sessions)
     {
         listOfSessions = new LinkedList<>();
         listOfSessions.addAll(sessions);
-    }
-
-    public void addMetting(String met)
-    {
-
-        if(listOfMeetings.size() == 0)
-            setMeetingsString(met);
-        else
-            setMeetingsString(getMeetingsString()  + ", " +met);
-        listOfMeetings.add(met);
     }
 
     public void checkSessionsIntegrity(LinkedList<Sessio> sessions)

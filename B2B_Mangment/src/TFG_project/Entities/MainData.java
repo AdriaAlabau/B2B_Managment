@@ -14,6 +14,7 @@ public class MainData {
     private int nSessions;
     private LinkedList<Sessio> sessions;
     private LinkedList<EntityJson> entities;
+    private LinkedList<MeetingJson> meetingJsons;
 
     public static MainData SharedInstance()
     {
@@ -30,6 +31,7 @@ public class MainData {
         eventName = "";
         eventLocation = "";
         entities = new LinkedList<>();
+        meetingJsons = new LinkedList<>();
     }
 
     public void replaceInfo(MainData newMain)
@@ -115,10 +117,23 @@ public class MainData {
         newEnt.forEach(e -> entities.add(new EntityJson(e)));
     }
 
+    public void setMeetingJson(ObservableList<Meeting> newMet)
+    {
+        meetingJsons.clear();
+        newMet.forEach(e -> meetingJsons.add(new MeetingJson(e)));
+    }
+
     public LinkedList<Entity> getConvertedEntities()
     {
         LinkedList<Entity> lRet = new LinkedList<>();
         entities.forEach(e -> lRet.add(new Entity(e)));
+        return lRet;
+    }
+
+    public LinkedList<Meeting> getConvertedMeetings()
+    {
+        LinkedList<Meeting> lRet = new LinkedList<>();
+        meetingJsons.forEach(e -> lRet.add(new Meeting(e)));
         return lRet;
     }
 
@@ -127,5 +142,12 @@ public class MainData {
     public void setNewEntity(EntityJson newEntity)
     {
         entities.add(newEntity);
+    }
+
+    public LinkedList<MeetingJson> getMeetings() {return meetingJsons;}
+
+    public void setNewMeeting(MeetingJson newMeeting)
+    {
+        meetingJsons.add(newMeeting);
     }
 }
