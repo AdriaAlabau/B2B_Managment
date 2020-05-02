@@ -2,6 +2,7 @@ package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
 import TFG_project.HELPERS.Constants;
+import TFG_project.HELPERS.Pair;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,95 +28,93 @@ import java.util.Map;
 public class SetArribalInfo {
 
     @FXML
-    private GridPane sessionsGridPane;
+    private HBox mediumHBOX;
 
     private LinkedList<Sessio> currentSessions;
 
     class SessionColumn
     {
-        public Label title;
-        public CheckBox attendingPicker;
-        public ChoiceBox<String> startHour;
-        public ChoiceBox<String> endHour;
 
+        public VBox mainVBox;
+
+        private CheckBox attendingPicker;
+        private Label title;
+
+        private GridPane gridPane;
+        private LinkedList<CheckBox> hours;
 
         private SessioAttending sessio;
         private Sessio mainSessio;
 
+        private boolean didChange = false;
+
         public SessionColumn(int i, SessioAttending entitySes, Sessio mSes)
         {
+
             sessio = entitySes;
             mainSessio = mSes;
-            title = new Label("Session " + i);
+            mainVBox = new VBox();
 
+            //HBOX amb label i checkbox (main atending)
+            title = new Label("Session " + i);
             attendingPicker = new CheckBox();
             attendingPicker.setSelected(sessio.getAttending());
-
             attendingPicker.selectedProperty().addListener(new ChangeListener<Boolean>() {
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-
-                    startHour.setDisable(!newValue);
-                    endHour.setDisable(!newValue);
+                    hours.forEach(ch -> ch.setDisable(!newValue));
+                    didChange = true;
                 }
             });
-            var init = Constants.ARRAYOFSTART.indexOf(mainSessio.getHoraInici());
-            var end = Constants.ARRAYOFSTART.indexOf(mainSessio.getHoraFis());
 
-            var arrayStartMod = FXCollections.observableArrayList(Constants.ARRAYOFSTART.subList(init, end > -1 ? end : Constants.ARRAYOFSTART.size()));
+            //set gridPane de 2xN amb temps i check bindejat
+            gridPane = new GridPane();
+            gridPane.setGridLinesVisible(true);
+            ColumnConstraints column1 = new ColumnConstraints(80);
+            column1.setHalignment(HPos.CENTER);
+            gridPane.getColumnConstraints().add(column1);
+            ColumnConstraints column2 = new ColumnConstraints(40);
+            column2.setHalignment(HPos.CENTER);
+            gridPane.getColumnConstraints().add(column2);
 
-            init = Constants.ARRAYOFEND.indexOf(mainSessio.getHoraInici());
-            end = Constants.ARRAYOFEND.indexOf(mainSessio.getHoraFis());
+            gridPane.getRowConstraints().add(new RowConstraints(40));
+            gridPane.setAlignment(Pos.CENTER);
 
-            var arrayEndMod = FXCollections.observableArrayList(Constants.ARRAYOFEND.subList(init > -1 ? init+1 : 0, end+1));
+            gridPane.add(title, 0,0);
+            gridPane.add(attendingPicker, 1, 0);
 
-            startHour = new ChoiceBox<>(arrayStartMod);
-            startHour.setTooltip(new Tooltip("Select Start Hour"));
+            hours = new LinkedList<>();
 
-            startHour.setValue(arrayStartMod.indexOf(sessio.getHoraInici()) == -1 ? mainSessio.getHoraInici() : sessio.getHoraInici());
-            startHour.getSelectionModel().selectedIndexProperty().addListener(new
-              ChangeListener<Number>() {
-                  @Override
-                  public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                      /*String newValueStr = arrayOfStart.get(newValue.intValue());
+            int pos = 1;
+            for (Pair<String, Boolean> pair :entitySes.getAttendingSet()) {
+                gridPane.getRowConstraints().add(new RowConstraints(30));
+                Label date = new Label(pair.getL());
+                gridPane.add(date, 0, pos);
 
-                      //sessio.setHoraInici(newValueStr);
-                      int index = arrayOfStart.indexOf(newValueStr);
-                      int indexLast = arrayOfEnd.indexOf(sessio.getHoraFis());
-                      if(index > indexLast)
-                      {
-                          endHour.setValue(arrayOfEnd.get(index));
-                      }*/
-                  }
-              });
-
-            endHour = new ChoiceBox<>(arrayEndMod);
-            endHour.setTooltip(new Tooltip("Select End Hour"));
-            endHour.setValue(arrayEndMod.indexOf(sessio.getHoraFis()) == -1 ? mainSessio.getHoraFis() : sessio.getHoraFis());
-            endHour.getSelectionModel().selectedIndexProperty().addListener(new
-                ChangeListener<Number>() {
+                CheckBox auxiliarCheckBox = new CheckBox();
+                hours.add(auxiliarCheckBox);
+                auxiliarCheckBox.setSelected(pair.getR());
+                auxiliarCheckBox.setDisable(!sessio.getAttending());
+                auxiliarCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
-                    public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                        /*String newValueStr = arrayOfEnd.get(newValue.intValue());
-                        //sessio.setHoraFi(newValueStr);
-
-                        //sessio.setHoraInici(newValueStr);
-                        int indexLast = arrayOfEnd.indexOf(newValueStr);
-                        int index = arrayOfStart.indexOf(sessio.getHoraInici());
-                        if(index > indexLast)
-                        {
-                            startHour.setValue(arrayOfStart.get(indexLast));
-                        }*/
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        didChange = true;
                     }
                 });
+                gridPane.add(auxiliarCheckBox, 1, pos);
+                pos++;
+            }
+            mainVBox.getChildren().add(gridPane);
+
+
         }
 
         public SessioAttending saveAndGetSessio()
         {
             sessio.setAttending(attendingPicker.isSelected());
-            sessio.setHoraFi(endHour.getValue());
-            sessio.setHoraInici(startHour.getValue());
-
+            if(attendingPicker.isSelected() && didChange)
+                for(int i = 0; i< hours.size(); i++)
+                    sessio.setWillAttend(i, hours.get(i).isSelected());
             return sessio;
         }
 
@@ -134,20 +133,13 @@ public class SetArribalInfo {
 
         Platform.runLater(() -> {
             int i = 1;
+            mediumHBOX.setSpacing(30);
+            mediumHBOX.setPadding(new Insets(10,10,10,10));
             for(Sessio ses : currentSessions)
             {
 
                 SessionColumn auxiliar = new SessionColumn(i, currentEntity.getListOfSessions().get(i-1), ses);
-                sessionsGridPane.add(auxiliar.title, i, 0);
-                sessionsGridPane.add(auxiliar.attendingPicker, i, 1);
-                sessionsGridPane.add(auxiliar.startHour, i, 2);
-                sessionsGridPane.add(auxiliar.endHour, i, 3);
-
-                ColumnConstraints constr = new ColumnConstraints(110);
-                constr.setHalignment(HPos.CENTER);
-
-                sessionsGridPane.getColumnConstraints().add(constr);
-
+                mediumHBOX.getChildren().add(auxiliar.mainVBox);
                 columns.add(auxiliar);
                 i++;
             }
@@ -169,7 +161,7 @@ public class SetArribalInfo {
         }
         currentEntity.setAttendingSessions(attendingSesions);
 
-        Stage stage = (Stage) sessionsGridPane.getScene().getWindow();
+        Stage stage = (Stage) mediumHBOX.getScene().getWindow();
 
         stage.close();
     }

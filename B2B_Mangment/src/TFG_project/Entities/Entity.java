@@ -10,7 +10,7 @@ public class Entity {
     private SimpleStringProperty name = new SimpleStringProperty("");
     private SimpleStringProperty attendees= new SimpleStringProperty("");
     private SimpleStringProperty entrance= new SimpleStringProperty("");
-    //private SimpleStringProperty attendingSessionsString= new SimpleStringProperty("");
+    private SimpleStringProperty attendingSessionsString= new SimpleStringProperty("");
     private LinkedList<SessioAttending> listOfSessions;
 
     public Entity(List<Sessio> days)
@@ -18,8 +18,9 @@ public class Entity {
         listOfSessions = new LinkedList<>();
         for(Sessio unit: days)
         {
-            listOfSessions.add(new SessioAttending(unit.getHoraInici(), unit.getHoraFis()));
+            listOfSessions.add(new SessioAttending(unit.getHoraInici(), unit.getHoraFis(), MainData.SharedInstance().getMeetingsDuration()));
         }
+        redoSessionsString();
     }
 
     public Entity(EntityJson copy)
@@ -65,13 +66,37 @@ public class Entity {
         this.entrance.set(entrance);
     }
 
+    public void setAttendingSessionsString(String s)
+    {
+        attendingSessionsString.set(s);
+    }
+
+    public String getAttendingSessionsString()
+    {
+        return attendingSessionsString.getValue();
+    }
+
     public LinkedList<SessioAttending> getListOfSessions(){
         return listOfSessions;
     }
+
     public void setAttendingSessions(List<SessioAttending> sessions)
     {
         listOfSessions = new LinkedList<>();
         listOfSessions.addAll(sessions);
+        redoSessionsString();
+    }
+
+    public void redoSessionsString()
+    {
+        attendingSessionsString.set("");
+
+        for (int i = 0; i< listOfSessions.size(); i++){
+            if(listOfSessions.get(i).getAttending())
+                attendingSessionsString.set(attendingSessionsString.getValue().equals("") ? "Session " + i : attendingSessionsString.getValue() + ", Session " + i);
+
+        }
+
     }
 
     public void checkSessionsIntegrity(LinkedList<Sessio> sessions)
@@ -87,7 +112,7 @@ public class Entity {
             }
             else
             {
-                listOfSessions.add(new SessioAttending(ses.getHoraInici(),ses.getHoraFis()));
+                listOfSessions.add(new SessioAttending(ses.getHoraInici(),ses.getHoraFis(), MainData.SharedInstance().getMeetingsDuration()));
             }
             i++;
         }

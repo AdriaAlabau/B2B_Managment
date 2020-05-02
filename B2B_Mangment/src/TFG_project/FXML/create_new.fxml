@@ -201,6 +201,11 @@
                             <PropertyValueFactory property="attendees" />
                         </cellValueFactory>
                     </TableColumn>
+                    <TableColumn prefWidth="400.0" text="Sessions attending">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="attendingSessionsString" />
+                        </cellValueFactory>
+                    </TableColumn>
                 </columns>
             </TableView>
             <TableView fx:id="meetingsTableView" prefHeight="433.0" prefWidth="956.0">

@@ -127,7 +127,6 @@ public class CreateNewController extends JFrame {
             }
         });
         meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
-        meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
         meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
           ChangeListener<Number>() {
               @Override
@@ -139,6 +138,7 @@ public class CreateNewController extends JFrame {
                   MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
               }
           });
+        meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
 
         preferedSessionChoiceBox.setItems(ListOfSessions);
         preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
@@ -289,9 +289,8 @@ public class CreateNewController extends JFrame {
                 controller.setEntity(currentEntity, MainData.SharedInstance().getSessions());
 
 
-                int width = MainData.SharedInstance().getNSessions() * 110+120;
-                int height = 260;
-                Scene scene = new Scene(root, Math.min(Math.max(width,350), 1700),height );
+                int width = MainData.SharedInstance().getNSessions() * 150 + 20;
+                Scene scene = new Scene(root, Math.min(width,1700), 900);
 
                 setUpAttendance.setScene(scene);
 
