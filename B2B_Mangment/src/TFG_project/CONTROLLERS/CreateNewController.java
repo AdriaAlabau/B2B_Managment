@@ -252,9 +252,31 @@ public class CreateNewController extends JFrame {
         }
     }
 
-    public void generateSchedule() throws Exception
+    public void accessSchedule()
     {
-        //CREEM OBJECTE SCALA I GUARDEM TOT
+       //TODO PREGUNTAR SI VOL GUARDAR
+        if(arrayMeetings.size() > 1)
+        {
+            Stage scheduleStage = new Stage();
+
+            MainData.SharedInstance().setEntities(arrayEntity);
+            MainData.SharedInstance().setMeetingJson(arrayMeetings);
+
+            Parent schedule = null;
+            try {
+                schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
+                scheduleStage.setTitle("Schedule");
+                int width = 1500;
+                int height = 900;
+                scheduleStage.setScene(new Scene(schedule, width,height));
+
+                scheduleStage.show();
+                ((Stage)eventName.getScene().getWindow()).close();
+            } catch (IOException e) {
+                int x = 0;
+            }
+        }
+
     }
 
     public void addNewMeeting()

@@ -12,46 +12,20 @@ public class SessioAttending {
     private boolean attending;
     private LinkedList<Pair<String,Boolean>> attendingSes;
 
-    public SessioAttending(String start, String end, int sep)
+    public SessioAttending(List<String> slots)
     {
         attending = true;
         attendingSes = new LinkedList<>();
 
-        var strStart = start.split(":");
-        int startHour = Integer.parseInt(strStart[0]);
-        int startMinute = Integer.parseInt(strStart[1]);
-
-        var strEnd = end.split(":");
-        int endHour = Integer.parseInt(strEnd[0]);
-        int endMinute = Integer.parseInt(strEnd[1]);
-
-        while(startHour < endHour || startMinute < endMinute)
-        {
-            attendingSes.add(new Pair(intToStrTime(startHour)+ ":" + intToStrTime(startMinute), true));
-            startMinute = startMinute + sep;
-            double res = ((double)startMinute) / 60;
-            if(res >= 1)
-            {
-                startHour++;
-                res = res-1;
-                startMinute = (int)(res*60);
-            }
-        }
+        slots.forEach(s -> attendingSes.add(new Pair(s, true)));
     }
 
-    private String intToStrTime(int time)
-    {
-        if(time <10)
-            return "0" + time;
-        else
-            return String.valueOf(time);
-    }
 
-    public SessioAttending(LinkedList<Pair<String,Boolean>> attendigSet)
+    /*public SessioAttending(LinkedList<Pair<String,Boolean>> attendigSet)
     {
         attending = true;
         attendingSes = attendigSet;
-    }
+    }*/
 
     public boolean getAttending() {return attending;}
 

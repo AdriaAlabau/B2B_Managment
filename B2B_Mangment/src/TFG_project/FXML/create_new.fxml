@@ -226,13 +226,14 @@
       </VBox>
    </center>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" prefHeight="37.0" prefWidth="1300.0" spacing="5.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_RIGHT" prefHeight="37.0" prefWidth="1300.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" onAction="#loadFile" text="Load" />
             <Button mnemonicParsing="false" onAction="#saveFile" text="Save" />
+            <Button mnemonicParsing="false" onAction="#accessSchedule" text="Next" />
          </children>
          <padding>
-            <Insets left="5.0" right="5.0" />
+            <Insets left="5.0" right="10.0" />
          </padding>
       </HBox>
    </bottom>

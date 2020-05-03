@@ -18,7 +18,7 @@ public class Entity {
         listOfSessions = new LinkedList<>();
         for(Sessio unit: days)
         {
-            listOfSessions.add(new SessioAttending(unit.getHoraInici(), unit.getHoraFis(), MainData.SharedInstance().getMeetingsDuration()));
+            listOfSessions.add(new SessioAttending(unit.getSlots()));
         }
         redoSessionsString();
     }
@@ -112,7 +112,7 @@ public class Entity {
             }
             else
             {
-                listOfSessions.add(new SessioAttending(ses.getHoraInici(),ses.getHoraFis(), MainData.SharedInstance().getMeetingsDuration()));
+                listOfSessions.add(new SessioAttending(ses.getSlots()));
             }
             i++;
         }

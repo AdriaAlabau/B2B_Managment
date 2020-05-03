@@ -109,8 +109,8 @@ public class SetUpController {
         public Sessio saveAndGetSessio()
         {
             sessio.setDate(datePicker.getValue());
-            sessio.setHoraFi(endHour.getValue());
             sessio.setHoraInici(startHour.getValue());
+            sessio.setHoraFi(endHour.getValue());
             for (TextField tf: tablesConfig) {
                 try{
                     int value = Integer.parseInt(tf.getText());

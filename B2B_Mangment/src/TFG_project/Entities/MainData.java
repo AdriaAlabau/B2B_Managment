@@ -137,7 +137,9 @@ public class MainData {
         return lRet;
     }
 
-    public LinkedList<EntityJson> getEntities() {return entities;}
+    public LinkedList<EntityJson> getEntities() {
+        return entities;
+    }
 
     public void setNewEntity(EntityJson newEntity)
     {
