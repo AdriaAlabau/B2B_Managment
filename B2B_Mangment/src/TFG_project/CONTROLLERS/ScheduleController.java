@@ -1,10 +1,8 @@
 package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
-import TFG_project.HELPERS.Pair;
+import TFG_project.SCALA.Encoding;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -14,9 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-import java.awt.*;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class ScheduleController {
 
@@ -119,5 +115,68 @@ public class ScheduleController {
                 j++;
             }
         });
+    }
+
+    public void computeSchedule()
+    {
+
+        ///nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Int], taulesXSessio : Array[Array[Int]], mettingXParticipant : Array[Array[Int]],  forbidden: Array[Array[Int]], gapSlots: Array[Array[Int]] , gapMeetings: Array[Array[Int]], participants : Array[Array[Int]]
+
+        HashMap<String, Integer> entitiesIdToPos = new HashMap<>();
+        int posEntity = 0;
+        int posSlot = 0;
+
+        Vector<Integer> nAttendeesParticipant = new Vector<>();
+        Vector<Integer> taulesXSessio = new Vector<>();
+        Vector<Vector<Integer>> meetings = new Vector<>();
+        Vector<Vector<Integer>> forbidden = new Vector<>();
+        Vector<Vector<Integer>> gapSlots = new Vector<>();
+        Vector<Vector<Integer>> gapMeetings = new Vector<>(); // fer al reves???
+        Vector<Vector<Integer>> participants = new Vector<>();
+
+        for(var x : MainData.SharedInstance().getEntities())
+        {
+            try {
+                nAttendeesParticipant.add(Integer.parseInt(x.attendees));
+            }
+            catch (Exception e)
+            {
+                nAttendeesParticipant.add(1);
+            }
+            entitiesIdToPos.put(x.id, posEntity);
+            posEntity++;
+
+            forbidden.add( x.getForbbiden());
+            meetings.add(new Vector<>());
+        }
+
+        for(var x : MainData.SharedInstance().getSessions())
+        {
+            taulesXSessio.add(x.getListOfTables().size());
+            Vector<Integer> listOfSlots = new Vector<>();
+            for(var slot : x.getSlots())
+            {
+                listOfSlots.add(posSlot);
+                posSlot++;
+            }
+            gapSlots.add(listOfSlots);
+        }
+
+        int meetingCounter = 0;
+        for(var x : MainData.SharedInstance().getMeetings())
+        {
+            var set = new Vector<Integer>();
+            for(var j : x.listOfParticipants)
+            {
+                var entityPos =entitiesIdToPos.get(x);
+                set.add(entityPos);
+                meetings.get(entityPos).add(meetingCounter);
+            }
+            participants.add(set);
+            meetingCounter++;
+        }
+        
+        Encoding.codificar(MainData.SharedInstance().getMeetings().size(),0, MainData.SharedInstance().getNSessions(), (Integer[]) nAttendeesParticipant.toArray(), (Integer[][])taulesXSessio.toArray(),
+                (Integer[][])meetings.toArray(), (Integer[][])forbidden.toArray(),  (Integer[][])gapSlots.toArray(), new Integer[2][], (Integer[][])participants.toArray() );
     }
 }

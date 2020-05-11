@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TabPane?>
@@ -56,6 +57,12 @@
       </HBox>
    </top>
    <bottom>
-      <HBox prefHeight="43.0" prefWidth="1500.0" BorderPane.alignment="CENTER" />
+      <HBox alignment="CENTER_RIGHT" prefHeight="43.0" prefWidth="1500.0" BorderPane.alignment="CENTER_RIGHT">
+         <children>
+            <Button mnemonicParsing="false" onAction="#computeSchedule" text="Compute" wrapText="true" />
+         </children>
+         <padding>
+            <Insets right="15.0" />
+         </padding></HBox>
    </bottom>
 </BorderPane>

@@ -239,6 +239,7 @@ public class SetUpController {
 
                 lastGridPos++;
             }
+            newTableValue.setText("");
 
         }
         catch(Exception e)
@@ -255,6 +256,7 @@ public class SetUpController {
                 }
 
                 lastGridPos++;
+                newTableValue.setText("");
             }
         }
 

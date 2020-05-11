@@ -93,7 +93,7 @@ public class Entity {
 
         for (int i = 0; i< listOfSessions.size(); i++){
             if(listOfSessions.get(i).getAttending())
-                attendingSessionsString.set(attendingSessionsString.getValue().equals("") ? "Session " + i : attendingSessionsString.getValue() + ", Session " + i);
+                attendingSessionsString.set(attendingSessionsString.getValue().equals("") ? "Session " + (i+1) : attendingSessionsString.getValue() + ", Session " + (i+1));
 
         }
 
