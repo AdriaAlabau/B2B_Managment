@@ -18,7 +18,10 @@ public class Main extends Application {
 
         Parent root = FXMLLoader.load(getClass().getResource("FXML/create_new.fxml"));
         primaryStage.setTitle("B2B_Managment");
-        primaryStage.setScene(new Scene(root, 1300, 900));
+        var scene = new Scene(root, 1300, 900);
+        primaryStage.setMinWidth(root.minWidth(-1));
+        primaryStage.setMinHeight(root.minHeight(-1));
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 }

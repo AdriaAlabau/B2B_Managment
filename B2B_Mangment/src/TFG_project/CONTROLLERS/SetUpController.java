@@ -265,8 +265,8 @@ public class SetUpController {
     private void setNewRowStuff(int gridPos, int seats)
     {
         tableValues.add(seats);
-        Label label = new Label("N Tables of " + (seats == 0 ? "N" : seats));
-        label.setFont(Font.font ("System", FontWeight.BOLD, 14));
+        //Label label = new Label("N Tables of " + (seats == 0 ? "N" : seats));
+        Label label = new Label("Tables");
 
         sessionsGridPane.add(label, 0,  gridPos);
         RowConstraints constr = new RowConstraints(40);

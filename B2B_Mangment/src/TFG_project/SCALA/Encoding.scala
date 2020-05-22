@@ -83,7 +83,7 @@ object Encoding {
     //Una entitat no te reunions en hores marcades que no assistira
 
     //REVISAR SI FORBIDEN ES CORRECTE
-    for (meeting <- 0 until nMeetings; forb <- forbidden(meeting); meet <- entityMeetings(meeting)) {
+    for (entity <- entityMeetings.indices; forb <- forbidden(entity); meet <- entityMeetings(entity)) {
       e.addClause((-(schedule(meet)(forb))) :: List())
     }
 

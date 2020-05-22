@@ -12,21 +12,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainLayout" prefHeight="215.0" prefWidth="363.0" spacing="5.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.SetUpController">
+<VBox fx:id="mainLayout" minHeight="250.0" minWidth="350.0" prefHeight="261.0" prefWidth="487.0" spacing="5.0" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.SetUpController">
    <children>
-      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="-Infinity" prefHeight="40.0">
+      <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="-Infinity" prefHeight="40.0" VBox.vgrow="NEVER">
          <children>
-            <Label text="Set Sessions Info">
-               <HBox.margin>
-                  <Insets left="15.0" top="15.0" />
-               </HBox.margin>
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
+            <Label style="-fx-font-family: arialBlack;" styleClass="title1" text="Set Sessions Info">
+            <HBox.margin>
+               <Insets left="15.0" top="15.0" />
+            </HBox.margin>
+            <font>
+               <Font name="Arial Black" size="14.0" />
+            </font>
             </Label>
          </children>
       </HBox>
-      <GridPane fx:id="sessionsGridPane" alignment="CENTER_LEFT" gridLinesVisible="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+      <GridPane fx:id="sessionsGridPane" alignment="CENTER_LEFT" gridLinesVisible="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
         <columnConstraints>
           <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" />
         </columnConstraints>
@@ -59,18 +59,21 @@
             <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
          </padding>
       </GridPane>
-      <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0">
+      <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" VBox.vgrow="NEVER">
          <children>
-            <Label text="Add new table config" />
-            <TextField fx:id="newTableValue" alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="43.0" HBox.hgrow="NEVER" />
-            <Button mnemonicParsing="false" onAction="#setNewTableValue" text="Add" />
-            <Label text="Use * to add a custom table">
+            <Label text="Add new table config" visible="false" />
+            <TextField fx:id="newTableValue" alignment="CENTER_RIGHT" disable="true" prefHeight="27.0" prefWidth="43.0" visible="false" HBox.hgrow="NEVER" />
+            <Button disable="true" mnemonicParsing="false" onAction="#setNewTableValue" text="Add" visible="false" />
+            <Label text="Use * to add a custom table" visible="false">
                <font>
                   <Font size="11.0" />
                </font>
             </Label>
             <Pane HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#saveInfoAction" text="Save" />
+            <Button mnemonicParsing="false" onAction="#saveInfoAction" prefHeight="28.0" prefWidth="68.0" styleClass="custom_button" text="Save">
+               <HBox.margin>
+                  <Insets bottom="10.0" right="10.0" />
+               </HBox.margin></Button>
          </children>
          <padding>
             <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />

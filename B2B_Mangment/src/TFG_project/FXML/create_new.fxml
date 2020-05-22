@@ -19,27 +19,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: -secondary-color;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.CreateNewController">
+<BorderPane minHeight="800.0" minWidth="900.0" prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.CreateNewController">
    <top>
-      <VBox prefHeight="39.0" prefWidth="1300.0" BorderPane.alignment="CENTER">
+      <VBox maxHeight="39.0" minHeight="39.0" prefHeight="39.0" prefWidth="1300.0" BorderPane.alignment="CENTER">
          <children>
-            <Label text="CREATING NEW SCHEDULE">
+            <Label style="-fx-font-family: arialBlack;" styleClass="title1" text="CREATING NEW SCHEDULE">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
+               <font>
+                  <Font name="Arial Black" size="14.0" />
+               </font>
             </Label>
          </children>
       </VBox>
    </top>
    <left>
-      <VBox prefHeight="735.0" prefWidth="344.0" BorderPane.alignment="CENTER">
+      <VBox BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="179.0" prefWidth="324.0">
+            <VBox alignment="TOP_RIGHT" prefHeight="160.0" prefWidth="334.0" VBox.vgrow="NEVER">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
                <children>
-                  <GridPane prefHeight="134.0" prefWidth="324.0" vgap="5.0">
+                  <GridPane prefHeight="134.0" prefWidth="324.0" vgap="5.0" VBox.vgrow="NEVER">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.0" minWidth="10.0" prefWidth="121.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="203.0" />
@@ -58,22 +61,22 @@
                         <TextField fx:id="eventLocation" prefHeight="27.0" prefWidth="162.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <TextField fx:id="numberOfSessions" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Meetings duration" GridPane.rowIndex="3" />
-                        <ChoiceBox fx:id="meetingDurationChoiceBox" prefHeight="27.0" prefWidth="195.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <ChoiceBox fx:id="meetingDurationChoiceBox" prefHeight="26.0" prefWidth="207.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="NEVER" />
                      </children>
                   </GridPane>
-                  <Button mnemonicParsing="false" onAction="#openSetUpSessions" text="Set up sessions">
+                  <Button mnemonicParsing="false" onAction="#openSetUpSessions" prefHeight="15.0" prefWidth="115.0" styleClass="custom_button" text="Set up sessions">
                      <VBox.margin>
-                        <Insets left="10.0" top="10.0" />
+                        <Insets top="10.0" />
                      </VBox.margin>
                   </Button>
                </children>
             </VBox>
-            <VBox prefHeight="189.0" prefWidth="344.0" spacing="10.0" style="-fx-background-color: -primary-color; -fx-border-color: black;">
+            <VBox prefHeight="171.0" prefWidth="344.0" spacing="10.0" style="-fx-background-color: darkGrey; -fx-border-color: black;" VBox.vgrow="NEVER">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="25.0" />
                </VBox.margin>
                <children>
-                  <Label text="Set New Entity">
+                  <Label text="Set New Entity" VBox.vgrow="NEVER">
                      <VBox.margin>
                         <Insets left="5.0" top="5.0" />
                      </VBox.margin>
@@ -81,7 +84,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
-                  <GridPane vgap="5.0">
+                  <GridPane vgap="5.0" VBox.vgrow="NEVER">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="161.0" minWidth="10.0" prefWidth="119.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="221.0" minWidth="10.0" prefWidth="203.0" />
@@ -104,11 +107,11 @@
                         <TextField fx:id="newEntityNumber" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
-                  <HBox prefHeight="27.0" prefWidth="342.0">
+                  <HBox prefHeight="27.0" prefWidth="342.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#setArribalInfo" prefHeight="27.0" prefWidth="101.0" text="Set arribal info" />
+                        <Button mnemonicParsing="false" onAction="#setArribalInfo" prefHeight="27.0" prefWidth="101.0" styleClass="custom_button" text="Set arribal info" />
                         <Pane prefHeight="30.0" prefWidth="137.0" />
-                        <Button mnemonicParsing="false" onAction="#addEntityToTable" text="Add entity" />
+                        <Button mnemonicParsing="false" onAction="#addEntityToTable" styleClass="custom_button" text="Add entity" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" />
@@ -116,7 +119,7 @@
                   </HBox>
                </children>
             </VBox>
-            <VBox prefHeight="405.0" prefWidth="344.0" spacing="10.0" style="-fx-border-color: black; -fx-background-color: -primary-color;">
+            <VBox spacing="10.0" style="-fx-border-color: black; -fx-background-color: darkGrey;" VBox.vgrow="ALWAYS">
                <children>
                   <Label text="Set New Meeting">
                      <VBox.margin>
@@ -126,7 +129,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Label>
-                  <HBox prefHeight="29.0" prefWidth="342.0" spacing="10.0">
+                  <HBox prefHeight="29.0" prefWidth="342.0" spacing="10.0" VBox.vgrow="NEVER">
                      <children>
                         <Label prefHeight="27.0" prefWidth="159.0" text="Prefererred session" />
                         <Pane prefHeight="27.0" prefWidth="127.0" HBox.hgrow="ALWAYS" />
@@ -136,7 +139,7 @@
                         <Insets left="5.0" right="10.0" />
                      </padding>
                   </HBox>
-                  <Label text="Meeting participants">
+                  <Label text="Meeting participants" VBox.vgrow="NEVER">
                      <VBox.margin>
                         <Insets left="10.0" />
                      </VBox.margin>
@@ -144,11 +147,11 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <ScrollPane hbarPolicy="NEVER" prefHeight="381.0" prefWidth="332.0" style="-fx-background-color: skyBlue;">
+                  <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: darkGrey;" VBox.vgrow="ALWAYS">
                      <content>
-                        <VBox prefHeight="267.0" prefWidth="341.0" style="-fx-background-color: -primary-color;">
+                        <VBox style="-fx-background-color: darkGrey;">
                            <children>
-                              <GridPane fx:id="newMettingsGroup" vgap="3.0">
+                              <GridPane fx:id="newMettingsGroup" vgap="3.0" VBox.vgrow="ALWAYS">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="153.0" minWidth="10.0" prefWidth="24.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="290.0" minWidth="10.0" prefWidth="289.0" />
@@ -161,11 +164,11 @@
                         </VBox>
                      </content>
                   </ScrollPane>
-                  <HBox prefHeight="27.0" prefWidth="342.0">
+                  <HBox prefHeight="19.0" prefWidth="312.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#addNewMeeting" text="Add participant" />
+                        <Button mnemonicParsing="false" onAction="#addNewMeeting" styleClass="custom_button" text="Add participant" />
                         <Pane prefHeight="27.0" prefWidth="121.0" />
-                        <Button mnemonicParsing="false" onAction="#addMeetingToTable" text="Add Meeting" />
+                        <Button mnemonicParsing="false" onAction="#addMeetingToTable" styleClass="custom_button" text="Add Meeting" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" />
@@ -185,7 +188,7 @@
             <Insets />
          </BorderPane.margin>
          <children>
-            <TableView fx:id="entityTable" cacheShape="false" prefHeight="439.0" prefWidth="956.0">
+            <TableView fx:id="entityTable" cacheShape="false" prefHeight="439.0" prefWidth="956.0" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn prefWidth="150.0" text="ID">
                         <cellValueFactory>
@@ -209,7 +212,7 @@
                     </TableColumn>
                 </columns>
             </TableView>
-            <TableView fx:id="meetingsTableView" prefHeight="433.0" prefWidth="956.0">
+            <TableView fx:id="meetingsTableView" prefHeight="433.0" prefWidth="956.0" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn prefWidth="166.0" text="Sessions">
                     <cellValueFactory>
@@ -227,11 +230,11 @@
       </VBox>
    </center>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" prefHeight="37.0" prefWidth="1300.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_RIGHT" maxHeight="37.0" minHeight="37.0" prefHeight="37.0" prefWidth="1300.0" spacing="15.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#loadFile" text="Load" />
-            <Button mnemonicParsing="false" onAction="#saveFile" text="Save" />
-            <Button mnemonicParsing="false" onAction="#accessSchedule" text="Next" />
+            <Button mnemonicParsing="false" onAction="#loadFile" prefHeight="26.0" prefWidth="75.0" styleClass="custom_button" text="Load" HBox.hgrow="NEVER" />
+            <Button mnemonicParsing="false" onAction="#saveFile" prefHeight="27.0" prefWidth="78.0" styleClass="custom_button" text="Save" HBox.hgrow="NEVER" />
+            <Button mnemonicParsing="false" onAction="#accessSchedule" prefHeight="27.0" prefWidth="75.0" styleClass="custom_button" text="Next" HBox.hgrow="NEVER" />
          </children>
          <padding>
             <Insets left="5.0" right="10.0" />

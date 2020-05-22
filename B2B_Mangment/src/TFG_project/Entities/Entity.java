@@ -1,6 +1,7 @@
 package TFG_project.Entities;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,12 +43,20 @@ public class Entity {
         this.id.set(id);
     }
 
+    public StringProperty idProperty() {
+        return id;
+    }
+
     public String getName() {
         return name.get();
     }
 
     public void setName(String name) {
         this.name.set(name);
+    }
+
+    public StringProperty nameProperty() {
+        return name;
     }
 
     public String getAttendees() {
@@ -58,12 +67,20 @@ public class Entity {
         this.attendees.set(attendees);
     }
 
+    public StringProperty attendeesProperty() {
+        return attendees;
+    }
+
     public String getEntrance() {
         return entrance.get();
     }
 
     public void setEntrance(String entrance) {
         this.entrance.set(entrance);
+    }
+
+    public StringProperty entranceProperty() {
+        return entrance;
     }
 
     public void setAttendingSessionsString(String s)
@@ -74,6 +91,10 @@ public class Entity {
     public String getAttendingSessionsString()
     {
         return attendingSessionsString.getValue();
+    }
+
+    public StringProperty attendingSessionsStringProperty() {
+        return attendingSessionsString;
     }
 
     public LinkedList<SessioAttending> getListOfSessions(){

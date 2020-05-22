@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -55,8 +56,6 @@ public class CreateNewController extends JFrame {
     @FXML
     private TextField newEntityNumber;
 
-
-
     //MEETINGS
     @FXML
     private ComboBox preferedSessionChoiceBox;
@@ -70,7 +69,6 @@ public class CreateNewController extends JFrame {
 
     public static ObservableList<String> ListOfSessions = FXCollections.observableArrayList("All");
 
-
     @FXML
     private TableView entityTable;
 
@@ -79,8 +77,6 @@ public class CreateNewController extends JFrame {
 
     private ObservableList<Entity> arrayEntity= FXCollections.observableArrayList();
     private ObservableList<Meeting> arrayMeetings= FXCollections.observableArrayList();
-
-
 
     private Entity currentEntity;
     private Meeting currentMeeting;
@@ -144,6 +140,40 @@ public class CreateNewController extends JFrame {
         preferedSessionChoiceBox.setItems(ListOfSessions);
         preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
 
+        entityTable.setRowFactory(tv -> {
+            TableRow<Entity> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+
+                    Entity clickedRow = row.getItem();
+
+                    Stage setUpAttendance = new Stage();
+                    setUpAttendance.initModality(Modality.APPLICATION_MODAL);
+                    setUpAttendance.initOwner(eventName.getScene().getWindow());
+
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
+                        Parent root = (Parent)fxmlLoader.load();
+                        EntityDetailController controller = fxmlLoader.<EntityDetailController>getController();
+                        controller.setEntity(clickedRow, arrayEntity);
+
+                        int width = MainData.SharedInstance().getNSessions() * 150 + 50;
+                        Scene scene = new Scene(root, Math.min(width,1400), 900);
+                        setUpAttendance.setMinWidth(root.minWidth(-1));
+                        setUpAttendance.setMinHeight(root.minHeight(-1));
+                        setUpAttendance.setScene(scene);
+
+                        setUpAttendance.show();
+
+                    } catch (IOException e) {
+                        int x = 0;
+                    }
+                }
+            });
+            return row ;
+        });
+
         //Menu menu = new Menu("File");
     }
 
@@ -157,10 +187,11 @@ public class CreateNewController extends JFrame {
             Parent setUp = null;
             try {
                 setUp = FXMLLoader.load(getClass().getResource("../FXML/set_up.fxml"));
-                setUpSessions.setTitle("Set Up Sessions");
                 int width = MainData.SharedInstance().getNSessions() * 110+120;
                 int height = 345 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
-                setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1700),height ));
+                setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1400),height ));
+                setUpSessions.setMinWidth(setUp.minWidth(-1));
+                setUpSessions.setMinHeight(setUp.minHeight(-1));
 
                 setUpSessions.show();
             } catch (IOException e) {
@@ -224,8 +255,6 @@ public class CreateNewController extends JFrame {
     public void saveFile() throws Exception
     {
         //Obteim les dades i les guardem en un fitxer
-
-
         try {
             DirectoryChooser fileChooser = new DirectoryChooser();
             File file  = fileChooser.showDialog(eventName.getScene().getWindow());
@@ -314,7 +343,8 @@ public class CreateNewController extends JFrame {
 
                 int width = MainData.SharedInstance().getNSessions() * 150 + 20;
                 Scene scene = new Scene(root, Math.min(width,1700), 900);
-
+                setUpAttendance.setMinWidth(root.minWidth(-1));
+                setUpAttendance.setMinHeight(root.minHeight(-1));
                 setUpAttendance.setScene(scene);
 
                 setUpAttendance.show();

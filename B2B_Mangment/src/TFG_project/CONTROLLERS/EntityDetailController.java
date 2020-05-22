@@ -20,22 +20,20 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import javax.tools.Tool;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class SetArribalInfo {
+public class EntityDetailController {
 
     @FXML
     private HBox mediumHBOX;
 
-    private LinkedList<Sessio> currentSessions;
-
     class SessionColumn
     {
-
         public VBox mainVBox;
 
         private CheckBox attendingPicker;
@@ -45,15 +43,13 @@ public class SetArribalInfo {
         private LinkedList<CheckBox> hours;
 
         private SessioAttending sessio;
-        private Sessio mainSessio;
 
         private boolean didChange = false;
 
-        public SessionColumn(int i, SessioAttending entitySes, Sessio mSes)
+        public SessionColumn(int i, SessioAttending entitySes)
         {
 
             sessio = entitySes;
-            mainSessio = mSes;
             mainVBox = new VBox();
 
             //HBOX amb label i checkbox (main atending)
@@ -128,6 +124,14 @@ public class SetArribalInfo {
     };
 
     private Entity currentEntity;
+    private ObservableList<Entity> arrayEntity;
+
+    @FXML
+    private TextField newEntityId;
+    @FXML
+    private TextField newEntityName;
+    @FXML
+    private TextField newEntityNumber;
 
     LinkedList<SessionColumn> columns = new LinkedList<>();
 
@@ -136,12 +140,14 @@ public class SetArribalInfo {
 
         Platform.runLater(() -> {
             int i = 1;
+            newEntityNumber.setText(currentEntity.getAttendees());
+            newEntityId.setText(currentEntity.getId());
+            newEntityName.setText(currentEntity.getName());
             mediumHBOX.setSpacing(30);
             mediumHBOX.setPadding(new Insets(10,10,10,10));
-            for(Sessio ses : currentSessions)
+            for(SessioAttending ses : currentEntity.getListOfSessions())
             {
-
-                SessionColumn auxiliar = new SessionColumn(i, currentEntity.getListOfSessions().get(i-1), ses);
+                SessionColumn auxiliar = new SessionColumn(i, ses);
                 mediumHBOX.getChildren().add(auxiliar.mainVBox);
                 columns.add(auxiliar);
                 i++;
@@ -149,19 +155,41 @@ public class SetArribalInfo {
         });
     }
 
-    public void setEntity(Entity ent, LinkedList<Sessio> sessions)
+    public void setEntity(Entity ent, ObservableList<Entity> privateList)
     {
         currentEntity = ent;
-        currentSessions = sessions;
+        arrayEntity = privateList;
+    }
+
+    public void eraseAction()
+    {
+        arrayEntity.remove(currentEntity);
+
+        Stage stage = (Stage) mediumHBOX.getScene().getWindow();
+
+        stage.close();
     }
 
     public void saveInfoAction()
     {
+        currentEntity.setName(newEntityName.getText());
+        currentEntity.setId(newEntityId.getText());
+
+        try{
+            Integer.parseInt(newEntityNumber.getText());
+            currentEntity.setAttendees(newEntityNumber.getText());
+        }
+        catch (Exception e)
+        {
+
+        }
+
         LinkedList<SessioAttending> attendingSesions = new LinkedList<>();
         for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
         {
             attendingSesions.add(columns.get(i).saveAndGetSessio());
         }
+
         currentEntity.setAttendingSessions(attendingSesions);
 
         Stage stage = (Stage) mediumHBOX.getScene().getWindow();
