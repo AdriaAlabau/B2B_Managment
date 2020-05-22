@@ -1,81 +1,164 @@
 package TFG_project.SCALA
+import java.util
+
 import collection.mutable._
 import collection.mutable._
-import collection.JavaConverters._
-import collection.JavaConverters._
 import scala.Array.ofDim
+import scala.jdk.CollectionConverters._
 
 object Encoding {
-  def codificar(nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Integer], taulesXSessio : Array[Array[Integer]], mettingXParticipant : Array[Array[Integer]],  forbidden: Array[Array[Integer]], gapSlots: Array[Array[Integer]] , gapMeetings: Array[Array[Integer]], participants : Array[Array[Integer]] ){
 
-    var e = new ScalAT("/Users/jordic/Desktop/","/Users/jordic/Desktop/");
+  def convertirJavaAScala(llistat : java.util.ArrayList[java.util.ArrayList[Int]]) : Array[Array[Int]] =
+  {
+    var auxiliar = llistat.asScala.toArray
+    val llist : Array[Array[Int]] = new Array[Array[Int]](auxiliar.length)
+    for(aux <- auxiliar.indices)
+      llist(aux) = auxiliar(aux).asScala.toArray
+
+    llist
+  }
+
+  def convertirScalaAJava(llistat : Array[Array[Int]]) : java.util.ArrayList[java.util.ArrayList[Int]] =
+  {
+    var lRet = new java.util.ArrayList[java.util.ArrayList[Int]]()
+    for(i <- llistat.indices)
+    {
+      var aux = new util.ArrayList[Int]()
+      aux.addAll(llistat(i).toList.asJava)
+      lRet.add(aux)
+    }
+
+    lRet
+  }
+
+  /**
+   *
+   * @param nMeetings Contador de Reunions
+   * @param nSlots Contador Total Slots
+   * @param nSessions Contador Total de Reunions
+   * @param nAP attendesXParticipan contador de persones d'una entitat
+   * @param tXS taulesXSessio Per cada sessio el nombre de taules tipus N que disposa
+   * @param mXP entityMeetings Per cada entitat, les seves reunions
+   * @param fB forbidden per cada entitat, els slots als quals no assisteix
+   * @param sS sessioSlots per cada sessio, els slots que en formen part
+   * @param sM sessioMeetings per cada sessio, les reunions que poden tenir lloc
+   * @param mS  meetingSessions per cada reunio, les sessions a les que es pot produir
+   * @param mP meetingEntities per cada reunio, els seus participans
+   * @return
+   */
+
+  def codificar(nMeetings : Int, nSlots: Int, nSessions : Int,
+                nAP : java.util.ArrayList[Int],
+                tXS : java.util.ArrayList[Int], // Capacitat, ntaules
+                mXP : java.util.ArrayList[java.util.ArrayList[Int]],
+                fB: java.util.ArrayList[java.util.ArrayList[Int]],
+                sS: java.util.ArrayList[java.util.ArrayList[Int]] ,
+                sM: java.util.ArrayList[java.util.ArrayList[Int]],
+                mS: java.util.ArrayList[java.util.ArrayList[Int]],
+                mP: java.util.ArrayList[java.util.ArrayList[Int]]) : java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]] = {
+
+
+    val attendesXParticipan = nAP.asScala.toArray
+    val taulesXSessio = tXS.asScala.toArray
+    val entityMeetings = convertirJavaAScala(mXP)
+    val forbidden = convertirJavaAScala(fB)
+    val sessioSlots = convertirJavaAScala(sS)
+    val sessioMeetings = convertirJavaAScala(sM)
+    val meetingSessions = convertirJavaAScala(mS)
+    val meetingEntities = convertirJavaAScala(mP)
+
+    val e = new ScalAT("/Users/adriaalabau/Projects/TFG/","/Users/adriaalabau/Projects/TFG/");
 
     //Variables del viewpoint
-    var schedule = e.newVar2DArray(nMeetings,nSlots)
+    val schedule = e.newVar2DArray(nMeetings, nSlots)
 
     //CONSTRAINT 1
-    for(p <- mettingXParticipant.indices; ts <- 0 until nSlots) {
-      e.addAMK((for (i <- mettingXParticipant(p)) yield (schedule(i)(ts))).toList, nAttendeesParticipant(p))
+    //Una entitat es pot trobar en reunions com a molt el seu nombre de participants
+    for (p <- entityMeetings.indices; ts <- 0 until nSlots) {
+      e.addAMK((for (i <- entityMeetings(p)) yield (schedule(i)(ts))).toList, attendesXParticipan(p))
     }
 
 
     //CONSTRAINT 2
-    for(p <- participants.indices; forb <- forbidden(p); meet <- mettingXParticipant(p))
-    {
-        e.addClause((-(schedule(meet)(forb))) :: List())
+    //Una entitat no te reunions en hores marcades que no assistira
+
+    //REVISAR SI FORBIDEN ES CORRECTE
+    for (meeting <- 0 until nMeetings; forb <- forbidden(meeting); meet <- entityMeetings(meeting)) {
+      e.addClause((-(schedule(meet)(forb))) :: List())
     }
 
-    //CONSTRAINT 3 REVISAR ELS CASOS ALL
+
+    //CONSTRAINT 3  Afegim amb EO el llistat de tots els slots als quals la reunio pot tenir lloc. Neguem tots els contraris
     //CONSTRAINT 4
-    for(tG <- 0 until nSessions; i <- gapMeetings(tG))
-    {
-      e.addEOQuad((for (j <- gapSlots(tG)) yield (schedule(i)(j))).toList)
-      for(g2 <- 0 until nSessions) {
-        if (g2 != tG) {
-          for (slot <- gapSlots(g2)) {
-            e.addClause(-schedule(i)(slot) :: List())
-          }
-        }
+    //CONSTRAINT 5
+    //Una reunio nomes es pot trobar en un de tots els seus slots disponibles
+    for (meetingI <- meetingSessions.indices) {
+      e.addEOQuad((for (ses <- meetingSessions(meetingI); slot <- sessioSlots(ses)) yield (schedule(meetingI)(slot))).toList)
+
+      for (g2 <- 0 until nSessions if !meetingSessions(meetingI).contains(g2); slot <- sessioSlots(g2)) {
+        e.addClause(-schedule(meetingI)(slot) :: List())
       }
     }
-
-    //PER ACABAR
-    //CONSTRAINT 5
-    for(tSes <- 0 until nSessions; tSlot <- gapSlots(tSes); i <- gapMeetings(tSlot))
-      {
-        e.addEOQuad((for (j <- gapSlots(tSlot)) yield (schedule(i)(j))).toList)
-      }
-
 
     //CONSTRAINT 6
-    for(tSes <- 0 until nSessions; tSlot <- gapSlots(tSes))
-    {
-      e.addAMK((for (i <- gapMeetings(tSes)) yield schedule(i)(tSlot)).toList, taulesXSessio(tSes))
+    //Per cada slot de temps, les reunions de temps es poden colocar
+    for (tSes <- 0 until nSessions; tSlot <- sessioSlots(tSes)) {
+      e.addAMK((for (i <- sessioMeetings(tSes)) yield schedule(i)(tSlot)).toList, taulesXSessio(tSes))
+      for(i <- sessioMeetings(tSes))
+        System.out.println(schedule(i)(tSlot))
+
+      System.out.println("-----------------")
     }
 
+
+    /*for (tSes <- 0 until nSessions; tSlot <- sessioSlots(tSes)) {
+      val mida = 2
+      (for (meet <- sessioMeetings(tSes) if mettingXParticipant(meet).size <= mida) yield meet).toList
+    }*/
+
+    var lRet = new java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]]()
     //Solucionem
     if (e.solve()) {
 
-    //  for(i <- 0 to 8){
-       // for(j<- 0 to 8) {
-       //   for (k <- 0 to 8)
-       ///     if (e.getValue(graella(i)(j)(k))) print(k+1+" ")
-       //   if(j%3==2) print(" ")
-       // }
+      for (tSes <- 0 until nSessions) {
+        var sessio = new java.util.ArrayList[java.util.ArrayList[Int]]()
+
+        for (tSlot <- sessioSlots(tSes)) {
+          var slot = new java.util.ArrayList[Int]()
+
+          for (meet <- 0 until nMeetings) {
+            if (e.getValue(schedule(meet)(tSlot)))
+            {
+              System.out.println(schedule(meet)(tSlot))
+              slot.add(meet)
+            }
+          }
+          sessio.add(slot)
+        }
+        lRet.add(sessio)
+      }
+
+
+      // for(j<- 0 to 8) {
+      //   for (k <- 0 to 8)
+      ///     if (e.getValue(graella(i)(j)(k))) print(k+1+" ")
+      //   if(j%3==2) print(" ")
+      // }
       //  println
       //  if(i%3==2) println
-     // }
+      // }
+
+      //Printem estadistiques de solucio
+      println("Solving time: " + e.getTime.toString + " seconds")
+      println("N vars: " + e.getNVars)
+      println("N clauses: " + e.getNClauses)
+      println("N decisions: " + e.getDecisions)
+      println("N propagations: " + e.getPropagations)
+      println("N conflicts: " + e.getConflicts)
+
 
     }
 
-    //Printem estadistiques de solucio
-    println("Solving time: " + e.getTime.toString + " seconds")
-    println("N vars: " + e.getNVars)
-    println("N clauses: " +  e.getNClauses)
-    println("N decisions: " + e.getDecisions)
-    println("N propagations: " + e.getPropagations)
-    println("N conflicts: " + e.getConflicts)
-
+    lRet
   }
-
 }

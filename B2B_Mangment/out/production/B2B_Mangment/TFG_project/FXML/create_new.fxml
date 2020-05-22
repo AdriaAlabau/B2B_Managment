@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -18,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGray;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.CreateNewController">
+<BorderPane prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: -secondary-color;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.CreateNewController">
    <top>
       <VBox prefHeight="39.0" prefWidth="1300.0" BorderPane.alignment="CENTER">
          <children>
@@ -67,7 +68,7 @@
                   </Button>
                </children>
             </VBox>
-            <VBox prefHeight="189.0" prefWidth="344.0" spacing="10.0" style="-fx-background-color: darkGray; -fx-border-color: black;">
+            <VBox prefHeight="189.0" prefWidth="344.0" spacing="10.0" style="-fx-background-color: -primary-color; -fx-border-color: black;">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="25.0" />
                </VBox.margin>
@@ -115,7 +116,7 @@
                   </HBox>
                </children>
             </VBox>
-            <VBox prefHeight="405.0" prefWidth="344.0" spacing="10.0" style="-fx-background-color: darkGray; -fx-border-color: black;">
+            <VBox prefHeight="405.0" prefWidth="344.0" spacing="10.0" style="-fx-border-color: black; -fx-background-color: -primary-color;">
                <children>
                   <Label text="Set New Meeting">
                      <VBox.margin>
@@ -129,7 +130,7 @@
                      <children>
                         <Label prefHeight="27.0" prefWidth="159.0" text="Prefererred session" />
                         <Pane prefHeight="27.0" prefWidth="127.0" HBox.hgrow="ALWAYS" />
-                        <ChoiceBox fx:id="preferedSessionChoiceBox" prefWidth="150.0" />
+                        <ComboBox fx:id="preferedSessionChoiceBox" prefWidth="150.0" />
                      </children>
                      <padding>
                         <Insets left="5.0" right="10.0" />
@@ -143,9 +144,9 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <ScrollPane hbarPolicy="NEVER" prefHeight="381.0" prefWidth="332.0" style="-fx-background-color: darkGray;">
+                  <ScrollPane hbarPolicy="NEVER" prefHeight="381.0" prefWidth="332.0" style="-fx-background-color: skyBlue;">
                      <content>
-                        <VBox prefHeight="255.0" prefWidth="341.0" style="-fx-background-color: darkGrey;">
+                        <VBox prefHeight="267.0" prefWidth="341.0" style="-fx-background-color: -primary-color;">
                            <children>
                               <GridPane fx:id="newMettingsGroup" vgap="3.0">
                                  <columnConstraints>

@@ -2,6 +2,7 @@ package TFG_project.Entities;
 
 import javafx.beans.property.SimpleStringProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -30,10 +31,10 @@ public class EntityJson {
         listOfSessions = sessions;
     }
 
-    public Vector<Integer> getForbbiden()
+    public ArrayList<Object> getForbbiden()
     {
         int mainCounter = 0;
-        Vector<Integer> lRet = new Vector<>();
+        ArrayList<Object> lRet = new ArrayList<>();
 
         for (var session: listOfSessions) {
             boolean attending= session.getAttending();
@@ -46,6 +47,20 @@ public class EntityJson {
             }
         }
 
+        return lRet;
+    }
+
+
+    public ArrayList<Object> getMeetings()
+    {
+        int mainCounter = 0;
+        ArrayList<Object> lRet = new ArrayList<>();
+        for (var session: listOfSessions) {
+            if(session.getAttending())
+                lRet.add(mainCounter);
+
+            mainCounter++;
+        }
         return lRet;
     }
 }

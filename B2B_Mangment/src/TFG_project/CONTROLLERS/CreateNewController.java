@@ -59,7 +59,7 @@ public class CreateNewController extends JFrame {
 
     //MEETINGS
     @FXML
-    private ChoiceBox preferedSessionChoiceBox;
+    private ComboBox preferedSessionChoiceBox;
     @FXML
     private GridPane newMettingsGroup;
 
