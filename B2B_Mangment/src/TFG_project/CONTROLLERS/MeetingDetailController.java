@@ -1,6 +1,7 @@
 package TFG_project.CONTROLLERS;
 
         import TFG_project.Entities.*;
+        import TFG_project.HELPERS.AlertDialog;
         import TFG_project.HELPERS.Constants;
         import TFG_project.HELPERS.Pair;
         import javafx.application.Platform;
@@ -50,8 +51,6 @@ public class MeetingDetailController {
     @FXML
     private ChoiceBox preferedSessionChoiceBox;
 
-
-
     @FXML
     protected void initialize() {
 
@@ -100,7 +99,9 @@ public class MeetingDetailController {
 
     public void eraseAction()
     {
-        arrayEntity.remove(currentMeeting);
+        if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Are you sure you want to erase this meeting?").get() == ButtonType.OK) {
+            arrayEntity.remove(currentMeeting);
+        }
 
        closeView();
     }
@@ -130,9 +131,13 @@ public class MeetingDetailController {
                 }
 
             }
+            closeView();
         }
+        else
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities in a meeting");
 
-        closeView();
+
+
     }
 
     private void closeView()

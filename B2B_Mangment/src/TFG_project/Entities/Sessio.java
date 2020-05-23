@@ -21,7 +21,7 @@ public class Sessio {
         horaInici = "08:00";
         horaFi = "20:00";
         listOfTables = new HashMap<Integer,TableForSession>();
-        listOfTables.put(0,new TableForSession(0,0));
+        listOfTables.put(0,new TableForSession(0,1));
 
         slots = new LinkedList<>();
         computeSlots();

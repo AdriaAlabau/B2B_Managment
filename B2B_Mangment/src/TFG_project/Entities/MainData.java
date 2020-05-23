@@ -2,6 +2,7 @@ package TFG_project.Entities;
 
 import javafx.collections.ObservableList;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,6 +82,21 @@ public class MainData {
                 sessions.add(new Sessio());
             }
         }
+    }
+
+    public int GetMaxNTables()
+    {
+        int res = -1;
+        for (var ses: sessions) {
+            for(var tab : ses.getListOfTables().entrySet())
+            {
+                if(tab.getValue().nUnits > res)
+                {
+                    res = tab.getValue().nUnits;
+                }
+            };
+        }
+        return res;
     }
 
     public int getNSessions()

@@ -3,9 +3,11 @@ package TFG_project.CONTROLLERS;
 import TFG_project.Entities.Entity;
 import TFG_project.Entities.MainData;
 import TFG_project.Entities.Meeting;
+import TFG_project.HELPERS.AlertDialog;
 import TFG_project.HELPERS.Constants;
 import TFG_project.SCALA.ScalAT;
 import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -35,6 +37,8 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class CreateNewController extends JFrame {
+
+    private boolean isReseting;
 
     //MAIN PART
     @FXML
@@ -90,125 +94,133 @@ public class CreateNewController extends JFrame {
 
     @FXML
     protected void initialize() {
-        addNewMeetingParticipant();
-        addNewMeetingParticipant();
 
-        eventName.textProperty().addListener((observable, oldValue, newValue) -> {
-            MainData.SharedInstance().setEventName(newValue);
-        });
+        Platform.runLater(() -> {
+            addNewMeetingParticipant();
+            addNewMeetingParticipant();
 
-        eventLocation.textProperty().addListener((observable, oldValue, newValue) -> {
-            MainData.SharedInstance().setEventLocation(newValue);
-        });
+            meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
+            preferedSessionChoiceBox.setItems(ListOfSessions);
 
-        numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
 
-            try
-            {
-                MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
+            entityTable.setRowFactory(tv -> {
+                TableRow<Entity> row = new TableRow<>();
+                row.setOnMouseClicked(event -> {
+                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                            && event.getClickCount() == 2) {
 
-                int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
+                        Entity clickedRow = row.getItem();
 
-                ListOfSessions.subList(1, ListOfSessions.size()).clear();
-                for(int i = 0; i< Integer.parseInt(newValue); i++)
-                {
-                    ListOfSessions.add("Session " + String.valueOf(i+1));
-                }
-                preferedSessionChoiceBox.setItems(ListOfSessions);
-                preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
-            }
-            catch (Exception e)
-            {
-                int x = 0;
-                //SHOW alert
-            }
-        });
-        meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
-        meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
-          ChangeListener<Number>() {
-              @Override
-              public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                  String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
+                        Stage entityDetail = new Stage();
+                        entityDetail.initModality(Modality.APPLICATION_MODAL);
+                        entityDetail.initOwner(eventName.getScene().getWindow());
 
-                  //sessio.setHoraInici(newValueStr);
-                  var arry = newValueStr.split(" ");
-                  MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
-              }
-          });
-        meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
+                        try {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
+                            Parent root = (Parent) fxmlLoader.load();
+                            EntityDetailController controller = fxmlLoader.<EntityDetailController>getController();
+                            controller.setEntity(clickedRow, arrayEntity);
 
-        preferedSessionChoiceBox.setItems(ListOfSessions);
-        preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
+                            int width = MainData.SharedInstance().getNSessions() * 150 + 50;
+                            Scene scene = new Scene(root, Math.min(width, 1300), 750);
+                            entityDetail.setMinWidth(root.minWidth(-1));
+                            entityDetail.setMinHeight(root.minHeight(-1));
+                            entityDetail.setScene(scene);
 
-        entityTable.setRowFactory(tv -> {
-            TableRow<Entity> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
-                        && event.getClickCount() == 2) {
+                            entityDetail.show();
 
-                    Entity clickedRow = row.getItem();
-
-                    Stage entityDetail = new Stage();
-                    entityDetail.initModality(Modality.APPLICATION_MODAL);
-                    entityDetail.initOwner(eventName.getScene().getWindow());
-
-                    try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
-                        Parent root = (Parent)fxmlLoader.load();
-                        EntityDetailController controller = fxmlLoader.<EntityDetailController>getController();
-                        controller.setEntity(clickedRow, arrayEntity);
-
-                        int width = MainData.SharedInstance().getNSessions() * 150 + 50;
-                        Scene scene = new Scene(root, Math.min(width,1300), 750);
-                        entityDetail.setMinWidth(root.minWidth(-1));
-                        entityDetail.setMinHeight(root.minHeight(-1));
-                        entityDetail.setScene(scene);
-
-                        entityDetail.show();
-
-                    } catch (IOException e) {
-                        int x = 0;
+                        } catch (IOException e) {
+                            int x = 0;
+                        }
                     }
+                });
+                return row;
+            });
+
+            meetingsTableView.setRowFactory(tv -> {
+                TableRow<Meeting> row = new TableRow<>();
+                row.setOnMouseClicked(event -> {
+                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                            && event.getClickCount() == 2) {
+
+                        Meeting clickedRow = row.getItem();
+
+                        Stage meetingDetail = new Stage();
+                        meetingDetail.initModality(Modality.APPLICATION_MODAL);
+                        meetingDetail.initOwner(eventName.getScene().getWindow());
+
+                        try {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_detail.fxml"));
+                            Parent root = (Parent) fxmlLoader.load();
+                            MeetingDetailController controller = fxmlLoader.<MeetingDetailController>getController();
+                            controller.setMeeting(clickedRow, arrayMeetings, ListOfSessions);
+
+
+                            Scene scene = new Scene(root, 400, 450);
+                            meetingDetail.setMinWidth(root.minWidth(-1));
+                            meetingDetail.setMinHeight(root.minHeight(-1));
+                            meetingDetail.setScene(scene);
+
+                            meetingDetail.show();
+
+                        } catch (IOException e) {
+                            int x = 0;
+                        }
+                    }
+                });
+                return row;
+            });
+
+            if (isReseting) {
+                refillInformation();
+                isReseting = false;
+            } else {
+                meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
+
+            }
+
+            eventName.textProperty().addListener((observable, oldValue, newValue) -> {
+                MainData.SharedInstance().setEventName(newValue);
+            });
+
+            eventLocation.textProperty().addListener((observable, oldValue, newValue) -> {
+                MainData.SharedInstance().setEventLocation(newValue);
+            });
+
+            numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                try {
+                    MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
+
+                    int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
+
+                    ListOfSessions.subList(1, ListOfSessions.size()).clear();
+                    for (int i = 0; i < Integer.parseInt(newValue); i++) {
+                        ListOfSessions.add("Session " + String.valueOf(i + 1));
+                    }
+                    preferedSessionChoiceBox.setItems(ListOfSessions);
+                    preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
+                } catch (Exception e) {
+                    int x = 0;
+                    //SHOW alert
                 }
             });
-            return row ;
+
+            meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
+                                                                                                     ChangeListener<Number>() {
+                                                                                                         @Override
+                                                                                                         public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
+                                                                                                             String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
+
+                                                                                                             //sessio.setHoraInici(newValueStr);
+                                                                                                             var arry = newValueStr.split(" ");
+                                                                                                             MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
+                                                                                                         }
+                                                                                                     });
+
+            preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
         });
 
-        meetingsTableView.setRowFactory(tv -> {
-            TableRow<Meeting> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
-                        && event.getClickCount() == 2) {
-
-                    Meeting clickedRow = row.getItem();
-
-                    Stage meetingDetail  = new Stage();
-                    meetingDetail.initModality(Modality.APPLICATION_MODAL);
-                    meetingDetail.initOwner(eventName.getScene().getWindow());
-
-                    try {
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_detail.fxml"));
-                        Parent root = (Parent)fxmlLoader.load();
-                        MeetingDetailController controller = fxmlLoader.<MeetingDetailController>getController();
-                        controller.setMeeting(clickedRow, arrayMeetings, ListOfSessions);
-
-
-                        Scene scene = new Scene(root, 400, 450);
-                        meetingDetail.setMinWidth(root.minWidth(-1));
-                        meetingDetail.setMinHeight(root.minHeight(-1));
-                        meetingDetail.setScene(scene);
-
-                        meetingDetail.show();
-
-                    } catch (IOException e) {
-                        int x = 0;
-                    }
-                }
-            });
-            return row ;
-        });
-
-        //Menu menu = new Menu("File");
     }
 
     public void openSetUpSessions()
@@ -234,11 +246,11 @@ public class CreateNewController extends JFrame {
         }
         else
         {
-            //TODO Show alert
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You must enter the number of sessions before editing them");
         }
     }
 
-    public void loadFile() throws Exception
+    public void loadFile()
     {
         try{
 
@@ -246,8 +258,6 @@ public class CreateNewController extends JFrame {
             File file  = fileChooser.showOpenDialog(eventName.getScene().getWindow());
 
             if (file != null) {
-
-                //This is where a real application would open the file.
                 try {
 
                     Scanner myReader = new Scanner(file);
@@ -259,23 +269,11 @@ public class CreateNewController extends JFrame {
 
                     Gson gson = new Gson();
                     MainData.SharedInstance().replaceInfo(gson.fromJson(data, MainData.class));
-                    eventName.setText(MainData.SharedInstance().getEventName());
-                    eventLocation.setText(MainData.SharedInstance().getEventLocation());
-                    numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
-                    meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
-
-                    arrayEntity.clear();
-                    arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
-
-                    arrayMeetings.clear();
-                    arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
-    
-                    entityTable.setItems(arrayEntity);
-                    meetingsTableView.setItems(arrayMeetings);
+                    refillInformation();
                 }
                 catch(Exception e)
                 {
-                    //BAD FORMAT FILE
+                    AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The selected file doesn't have the correct format");
                 }
             }
 
@@ -286,7 +284,29 @@ public class CreateNewController extends JFrame {
         }
     }
 
-    public void saveFile() throws Exception
+    private void refillInformation()
+    {
+        eventName.setText(MainData.SharedInstance().getEventName());
+        eventLocation.setText(MainData.SharedInstance().getEventLocation());
+        numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
+        meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
+
+        arrayEntity.clear();
+        arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
+
+        arrayMeetings.clear();
+        arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
+
+        entityTable.setItems(arrayEntity);
+        meetingsTableView.setItems(arrayMeetings);
+    }
+
+    public void resetInformation()
+    {
+        isReseting = true;
+    }
+
+    public void saveFile()
     {
         //Obteim les dades i les guardem en un fitxer
         try {
@@ -311,16 +331,21 @@ public class CreateNewController extends JFrame {
             }
 
         } catch (Exception e) {
-            int x = 0;
+            AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The selected file doesn't have the correct format");
 
         }
     }
 
     public void accessSchedule()
     {
-       //TODO PREGUNTAR SI VOL GUARDAR
-        if(arrayMeetings.size() > 1)
+
+        if(arrayMeetings.size() > 0 && arrayEntity.size() > 1)
         {
+            if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION,  null, "Do you want to save changes before moving forward?" ).get() == ButtonType.OK)
+            {
+                saveFile();
+            }
+
             Stage scheduleStage = new Stage();
 
             MainData.SharedInstance().setEntities(arrayEntity);
@@ -330,8 +355,8 @@ public class CreateNewController extends JFrame {
             try {
                 schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
                 scheduleStage.setTitle("Schedule");
-                int width = 1500;
-                int height = 900;
+                int width = MainData.SharedInstance().GetMaxNTables() * 100 + 280 + 70;
+                int height = 700;
                 scheduleStage.setScene(new Scene(schedule, width,height));
 
                 scheduleStage.show();
@@ -340,6 +365,8 @@ public class CreateNewController extends JFrame {
                 int x = 0;
             }
         }
+        else
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least one meeting and two entites to move forward");
 
     }
 
@@ -388,37 +415,45 @@ public class CreateNewController extends JFrame {
             }
         }
         else
-        {
-            //TODO Show alert
-        }
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You must enter the number of sessions before editing the entity schedule info");
     }
 
     public void addEntityToTable()
     {
         if(MainData.SharedInstance().getNSessions()> 0) {
+            if(!newEntityId.getText().equals("") && !newEntityName.getText().equals("")) {
+                try{
 
-            if(currentEntity == null)
-                currentEntity= new Entity(MainData.SharedInstance().getSessions());
+                    Integer.parseInt(newEntityNumber.getText());
+
+                    if (currentEntity == null)
+                        currentEntity = new Entity(MainData.SharedInstance().getSessions());
+                    else
+                        currentEntity.checkSessionsIntegrity(MainData.SharedInstance().getSessions());
+
+                    currentEntity.setId(newEntityId.getText());
+                    newEntityId.setText("");
+
+                    currentEntity.setName(newEntityName.getText());
+                    newEntityName.setText("");
+
+                    currentEntity.setAttendees(newEntityNumber.getText());
+                    newEntityNumber.setText("");
+
+                    arrayEntity.add(currentEntity);
+                    entityTable.setItems(arrayEntity);
+                    currentEntity = null;
+                }
+                catch(Exception e)
+                {
+                    AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The field number of attendees must be a number");
+                }
+            }
             else
-                currentEntity.checkSessionsIntegrity(MainData.SharedInstance().getSessions());
-
-            currentEntity.setId(newEntityId.getText());
-            newEntityId.setText("");
-
-            currentEntity.setName(newEntityName.getText());
-            newEntityName.setText("");
-
-            currentEntity.setAttendees(newEntityNumber.getText());
-            newEntityNumber.setText("");
-
-            arrayEntity.add(currentEntity);
-            entityTable.setItems(arrayEntity);
-            currentEntity = null;
+                AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You must enter valid entity data");
         }
         else
-        {
-           // show Alert
-        }
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You must enter the number of sessions before editing them");
     }
 
     public void addMeetingToTable()
@@ -459,6 +494,8 @@ public class CreateNewController extends JFrame {
             meetingsTableView.setItems(arrayMeetings);
             currentMeeting = null;
         }
+        else
+            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities to create a meeting");
     }
 
 

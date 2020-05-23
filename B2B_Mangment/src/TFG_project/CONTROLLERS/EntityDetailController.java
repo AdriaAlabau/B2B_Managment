@@ -1,6 +1,7 @@
 package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
+import TFG_project.HELPERS.AlertDialog;
 import TFG_project.HELPERS.Constants;
 import TFG_project.HELPERS.Pair;
 import javafx.application.Platform;
@@ -163,11 +164,13 @@ public class EntityDetailController {
 
     public void eraseAction()
     {
-        arrayEntity.remove(currentEntity);
+        if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Are you sure you want to erase this entity?").get() == ButtonType.OK) {
+            arrayEntity.remove(currentEntity);
 
-        Stage stage = (Stage) mediumHBOX.getScene().getWindow();
+            Stage stage = (Stage) mediumHBOX.getScene().getWindow();
 
-        stage.close();
+            stage.close();
+        }
     }
 
     public void saveInfoAction()

@@ -1,17 +1,22 @@
 package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
+import TFG_project.HELPERS.AlertDialog;
 import TFG_project.SCALA.Encoding;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 import java.util.*;
 
@@ -270,6 +275,38 @@ public class ScheduleController {
                     }
                 }
 
+            }
+        }
+        catch(Exception e)
+        {
+            int x = 0;
+        }
+    }
+
+    public void savePartialSolution()
+    {
+
+    }
+
+    public void goBackAction()
+    {
+        try {
+            if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Are you sure you want to go back? The current schedule won't be saved").get() == ButtonType.OK) {
+                Stage stage = new Stage();
+
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/create_new.fxml"));
+                Parent root = (Parent) fxmlLoader.load();
+                stage.setTitle("B2B_Managment");
+                CreateNewController controller = fxmlLoader.<CreateNewController>getController();
+                controller.resetInformation();
+                var scene = new Scene(root, 1300, 900);
+
+                stage.setMinWidth(root.minWidth(-1));
+                stage.setMinHeight(root.minHeight(-1));
+                stage.setScene(scene);
+                stage.show();
+
+                ((Stage)tabPane.getScene().getWindow()).close();
             }
         }
         catch(Exception e)
