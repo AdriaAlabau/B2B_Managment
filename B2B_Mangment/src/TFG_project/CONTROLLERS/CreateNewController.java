@@ -90,8 +90,8 @@ public class CreateNewController extends JFrame {
 
     @FXML
     protected void initialize() {
-        addNewMeeting();
-        addNewMeeting();
+        addNewMeetingParticipant();
+        addNewMeetingParticipant();
 
         eventName.textProperty().addListener((observable, oldValue, newValue) -> {
             MainData.SharedInstance().setEventName(newValue);
@@ -148,9 +148,9 @@ public class CreateNewController extends JFrame {
 
                     Entity clickedRow = row.getItem();
 
-                    Stage setUpAttendance = new Stage();
-                    setUpAttendance.initModality(Modality.APPLICATION_MODAL);
-                    setUpAttendance.initOwner(eventName.getScene().getWindow());
+                    Stage entityDetail = new Stage();
+                    entityDetail.initModality(Modality.APPLICATION_MODAL);
+                    entityDetail.initOwner(eventName.getScene().getWindow());
 
                     try {
                         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
@@ -159,12 +159,46 @@ public class CreateNewController extends JFrame {
                         controller.setEntity(clickedRow, arrayEntity);
 
                         int width = MainData.SharedInstance().getNSessions() * 150 + 50;
-                        Scene scene = new Scene(root, Math.min(width,1400), 900);
-                        setUpAttendance.setMinWidth(root.minWidth(-1));
-                        setUpAttendance.setMinHeight(root.minHeight(-1));
-                        setUpAttendance.setScene(scene);
+                        Scene scene = new Scene(root, Math.min(width,1300), 750);
+                        entityDetail.setMinWidth(root.minWidth(-1));
+                        entityDetail.setMinHeight(root.minHeight(-1));
+                        entityDetail.setScene(scene);
 
-                        setUpAttendance.show();
+                        entityDetail.show();
+
+                    } catch (IOException e) {
+                        int x = 0;
+                    }
+                }
+            });
+            return row ;
+        });
+
+        meetingsTableView.setRowFactory(tv -> {
+            TableRow<Meeting> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+
+                    Meeting clickedRow = row.getItem();
+
+                    Stage meetingDetail  = new Stage();
+                    meetingDetail.initModality(Modality.APPLICATION_MODAL);
+                    meetingDetail.initOwner(eventName.getScene().getWindow());
+
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_detail.fxml"));
+                        Parent root = (Parent)fxmlLoader.load();
+                        MeetingDetailController controller = fxmlLoader.<MeetingDetailController>getController();
+                        controller.setMeeting(clickedRow, arrayMeetings, ListOfSessions);
+
+
+                        Scene scene = new Scene(root, 400, 450);
+                        meetingDetail.setMinWidth(root.minWidth(-1));
+                        meetingDetail.setMinHeight(root.minHeight(-1));
+                        meetingDetail.setScene(scene);
+
+                        meetingDetail.show();
 
                     } catch (IOException e) {
                         int x = 0;
@@ -309,7 +343,7 @@ public class CreateNewController extends JFrame {
 
     }
 
-    public void addNewMeeting()
+    public void addNewMeetingParticipant()
     {
         TextField newTF = new TextField("");
         newTF.setPromptText("Set Entity Id...");

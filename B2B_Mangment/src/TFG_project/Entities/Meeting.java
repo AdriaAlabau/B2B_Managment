@@ -1,6 +1,7 @@
 package TFG_project.Entities;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,14 +37,28 @@ public class Meeting {
             this.sessio.set(name);
         }
 
+        public StringProperty sessioProperty() {
+            return sessio;
+        }
+
         public String getEntities() {return entities.get();}
 
         public void setEntities(String meetingsString) {
             this.entities.set(meetingsString);
         }
 
+        public StringProperty entitiesProperty() {
+            return entities;
+        }
+
         public LinkedList<String> getListOfParticipants(){
             return listOfParticipants;
+        }
+
+        public void cleanListOfParticipants()
+        {
+            listOfParticipants.clear();
+            setEntities("");
         }
 
         public void addMetting(String met)

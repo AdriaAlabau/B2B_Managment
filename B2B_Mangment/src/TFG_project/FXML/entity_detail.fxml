@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.EntityDetailController">
+<VBox minHeight="350.0" minWidth="350.0" style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.EntityDetailController">
     <children>
         <Label style="-fx-font-family: arialBlack;" styleClass="title1" text="Entity Detail">
             <padding>

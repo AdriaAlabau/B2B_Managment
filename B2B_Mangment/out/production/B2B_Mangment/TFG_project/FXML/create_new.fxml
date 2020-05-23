@@ -166,7 +166,7 @@
                   </ScrollPane>
                   <HBox prefHeight="19.0" prefWidth="312.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#addNewMeeting" styleClass="custom_button" text="Add participant" />
+                        <Button mnemonicParsing="false" onAction="#addNewMeetingParticipant" styleClass="custom_button" text="Add participant" />
                         <Pane prefHeight="27.0" prefWidth="121.0" />
                         <Button mnemonicParsing="false" onAction="#addMeetingToTable" styleClass="custom_button" text="Add Meeting" />
                      </children>
