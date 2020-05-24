@@ -1,6 +1,8 @@
 package TFG_project.SCALA
 import java.util
 
+import TFG_project.HELPERS.SimpleClass
+
 import collection.mutable._
 import collection.mutable._
 import scala.Array.ofDim
@@ -52,10 +54,11 @@ object Encoding {
                 tXS : java.util.ArrayList[Int], // Capacitat, ntaules
                 mXP : java.util.ArrayList[java.util.ArrayList[Int]],
                 fB: java.util.ArrayList[java.util.ArrayList[Int]],
-                sS: java.util.ArrayList[java.util.ArrayList[Int]] ,
+                sS: java.util.ArrayList[java.util.ArrayList[Int]],
                 sM: java.util.ArrayList[java.util.ArrayList[Int]],
                 mS: java.util.ArrayList[java.util.ArrayList[Int]],
-                mP: java.util.ArrayList[java.util.ArrayList[Int]]) : java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]] = {
+                mP: java.util.ArrayList[java.util.ArrayList[Int]],
+                pM: java.util.ArrayList[SimpleClass]) : java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]] = {
 
 
     val attendesXParticipan = nAP.asScala.toArray
@@ -66,6 +69,7 @@ object Encoding {
     val sessioMeetings = convertirJavaAScala(sM)
     val meetingSessions = convertirJavaAScala(mS)
     val meetingEntities = convertirJavaAScala(mP)
+    val predef = pM.asScala.toArray
 
     val e = new ScalAT("/Users/adriaalabau/Projects/TFG/","/Users/adriaalabau/Projects/TFG/");
 
@@ -78,6 +82,9 @@ object Encoding {
       e.addAMK((for (i <- entityMeetings(p)) yield (schedule(i)(ts))).toList, attendesXParticipan(p))
     }
 
+    for (p <- predef) {
+      e.addClause(schedule(p.meeting)(sessioSlots(p.sessio)(p.slot)) :: List())
+    }
 
     //CONSTRAINT 2
     //Una entitat no te reunions en hores marcades que no assistira

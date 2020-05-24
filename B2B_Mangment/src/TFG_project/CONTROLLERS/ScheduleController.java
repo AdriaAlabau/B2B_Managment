@@ -2,9 +2,11 @@ package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
 import TFG_project.HELPERS.AlertDialog;
+import TFG_project.HELPERS.SimpleClass;
 import TFG_project.HELPERS.WorkIndicatorDialog;
 import TFG_project.SCALA.Encoding;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -16,7 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseButton;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,9 +28,16 @@ import java.util.*;
 
 public class ScheduleController {
 
+    private final DataFormat stackPaneFormat = new DataFormat("STACKPANE");
+
+    private final String bruh = "WILDACARD";
+
+    private MeetingScheduled draggingMeeting;
+
     private class MeetingScheduled
     {
         public MeetingJson meeting;
+        public StackPane parent;
         public StackPane stackPane;
         public int id = 0;
         public int sessio = -1;
@@ -50,6 +59,7 @@ public class ScheduleController {
     private class CustomTab
     {
         public Tab tab;
+        private int sessioIndex;
         private ScrollPane scrollPane;
         private GridPane gridPane;
         private Sessio sessio;
@@ -58,6 +68,7 @@ public class ScheduleController {
 
         public CustomTab(Sessio ses, int i)
         {
+            sessioIndex = i-1;
             sessio = ses;
             tab = new Tab("Session " + i);
 
@@ -91,17 +102,26 @@ public class ScheduleController {
             {
                 for(int counter = 0 ; counter< entry.getValue().nUnits; counter++)
                 {
-                    ColumnConstraints auxiliarColumn = new ColumnConstraints(100);
+                    ColumnConstraints auxiliarColumn = new ColumnConstraints(170);
                     auxiliarColumn.setHalignment(HPos.CENTER);
 
                     gridPane.getColumnConstraints().add(auxiliarColumn);
-                    Label label = new Label("Table " + mainTableCounter + "\nSeats " +  entry.getKey());
+                    Label label = new Label("Table " + mainTableCounter);
 
                     mainTableCounter++;
                     gridPane.add(label, gridPane.getColumnCount()-1, 0);
                     nTaules++;
+
+                    for(int wild = 0; wild <sessio.getSlots().size(); wild++)
+                    {
+                        StackPane pane = new StackPane();
+                        pane.setPadding(new Insets(5,5,5,5));
+                        pane.setId(bruh);
+                        gridPane.add(pane, gridPane.getColumnCount()-1, wild+1);
+                    }
                 }
             }
+
 
             scrollPane.setContent(gridPane);
         }
@@ -109,14 +129,43 @@ public class ScheduleController {
         public void addMeeting(MeetingScheduled meet, int slot)
         {
             int i = 1;
-            while(i<= nTaules && getNodeFromGridPane(gridPane, i,slot+1) != null)
+            boolean cont = true;
+            while(i<= nTaules && cont)
             {
+
+                Node n = getNodeFromGridPane(gridPane, i,slot+1);
+                if(n.getId().equals(bruh)) {
+                    var node = (StackPane)n;
+                    cont = node.getChildren().size() != 0;
+                    meet.taula = i;
+                    node.getChildren().add(meet.stackPane);
+                    meet.parent = node;
+                    meet.slot = slot;
+                    meet.sessio = sessioIndex;
+                }
                 i++;
             }
+        }
 
-            meet.taula = i;
-            gridPane.add(meet.stackPane, i, slot+1);
-            GridPane.setMargin(meet.stackPane, new Insets(5, 5, 5, 5));
+        public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int x, int y)
+        {
+
+            Node n = getNodeFromGridPane(gridPane, x,y);
+            if(n.getId().equals(bruh) && ((StackPane)n).getChildren().size() == 0)
+            {
+                StackPane pane = (StackPane)n;
+                pane.getChildren().add(meeting.stackPane);
+                meeting.parent = pane;
+                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), y, false);
+                draggingMeeting.taula = x;
+                return true;
+            }
+            return false;
+        }
+
+        public boolean canGoThere(int columna, int row)
+        {
+            return getNodeFromGridPane(gridPane, columna,row).getId().equals(bruh);
         }
 
         private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -140,8 +189,7 @@ public class ScheduleController {
         Platform.runLater(() -> {
 
             //SET ENTITIES AND MEETINGS TO VBOX
-            //mediumHBOX.setSpacing(30);
-            //mediumHBOX.setPadding(new Insets(10,10,10,10));
+
             listOfTabs = new ArrayList<>();
 
             listOfScheduledMeetings = new ArrayList<>();
@@ -153,6 +201,52 @@ public class ScheduleController {
                 CustomTab auxiliar = new CustomTab(ses,i);
                 tabPane.getTabs().add(auxiliar.tab);
                 listOfTabs.add(auxiliar);
+
+                var list = auxiliar.gridPane.getChildren();
+                for(int pos = 1; pos <list.size(); pos++) {
+                    Node node = list.get(pos);
+
+
+                    node.setOnDragOver(new EventHandler<DragEvent>() {
+                        public void handle(DragEvent event) {
+                            //data is dragged over to target
+                            //accept it only if it is not dragged from the same node
+                            //and if it has image data
+
+                            //allow for moving
+
+                            event.acceptTransferModes(TransferMode.MOVE);
+
+                            event.consume();
+                        }
+                    });
+
+                    node.setOnDragDropped(new EventHandler<DragEvent>() {
+                        public void handle(DragEvent event) {
+
+                            Dragboard db = event.getDragboard();
+
+                            boolean success = false;
+                            if (db.hasContent(stackPaneFormat)) {
+                                //Node node = event.getPickResult().getIntersectedNode();
+                                CustomTab tab = listOfTabs.get(tabPane.getSelectionModel().getSelectedIndex());
+
+                                Integer cIndex = GridPane.getColumnIndex(node);
+                                Integer rIndex = GridPane.getRowIndex(node);
+                                int x = cIndex == null ? 0 : cIndex;
+                                int y = rIndex == null ? 0 : rIndex;
+
+                                success = tab.addAtTable(tab, draggingMeeting, x, y);
+
+                            }
+
+                            event.setDropCompleted(success);
+
+                            event.consume();
+                        }
+                    });
+                }
+
                 i++;
             }
 
@@ -200,6 +294,7 @@ public class ScheduleController {
 
                 meetingScheduled.stackPane.getChildren().add(label);
                 meetingScheduled.stackPane.setPadding(new Insets(5,5,5,5));
+                GridPane.setMargin(meetingScheduled.stackPane, new Insets(5,5,5,5));
 
                 meetingScheduled.stackPane.setAlignment(Pos.CENTER);
 
@@ -210,10 +305,77 @@ public class ScheduleController {
 
                 listOfScheduledMeetings.add(meetingScheduled);
 
+                meetingScheduled.stackPane.setOnDragDetected(new EventHandler<MouseEvent>() {
+                    public void handle(MouseEvent event) {
+                        //Drag was detected, start drap-and-drop gesture
+                        //Allow any transfer node
+                        Dragboard db = meetingScheduled.stackPane.startDragAndDrop(TransferMode.MOVE);
+
+                        db.setDragView(meetingScheduled.stackPane.snapshot(null, null));
+                        ClipboardContent cc = new ClipboardContent();
+                        cc.put(stackPaneFormat, " ");
+                        db.setContent(cc);
+                        draggingMeeting = meetingScheduled;
+
+                        meetingScheduled.stackPane.setVisible(false);
+
+                        event.consume();
+                    }
+                });
+
+                meetingScheduled.stackPane.setOnDragDone(new EventHandler <DragEvent>() {
+                    public void handle(DragEvent event){
+                        draggingMeeting.stackPane.setVisible(true);
+                        draggingMeeting = null;
+                        event.consume();
+                    }
+                });
+
+                //Drag over event handler is used for the receiving node to allow movement
+
                 j++;
             }
+
+
+            meetingsVBox.setOnDragOver(new EventHandler<DragEvent>() {
+                public void handle(DragEvent event) {
+                    //data is dragged over to target
+                    //accept it only if it is not dragged from the same node
+                    //and if it has image data
+
+                    //allow for moving
+
+                    event.acceptTransferModes(TransferMode.MOVE);
+
+                    event.consume();
+                }
+            });
+
+            meetingsVBox.setOnDragDropped(new EventHandler<DragEvent>() {
+                public void handle(DragEvent event) {
+                    Dragboard db = event.getDragboard();
+                    boolean success = false;
+
+                    if (draggingMeeting.taula != -1) {
+                        if (db.hasContent(stackPaneFormat)) {
+                            success = true;
+                            moveMeeting(meetingsVBox, draggingMeeting, 0,0, true);
+                        }
+                    }
+
+                    //draggingMeeting.stackPane.setVisible(true);
+                    //draggingMeeting = null;
+
+                    //let the source know whether the image was successfully transferred and used
+                    event.setDropCompleted(success);
+
+                    event.consume();
+                }
+            });
         });
     }
+
+
 
     public void computeSchedule()
     {
@@ -227,6 +389,7 @@ public class ScheduleController {
         wd.exec("", inputParam -> {
 
             HashMap<String, Integer> entitiesIdToPos = new HashMap<>();
+            ArrayList<Boolean> predefiniedMeet = new ArrayList<>();
             int posEntity = 0;
             int posSlot = 0;
             int mainCounterSlots = 0;
@@ -239,6 +402,7 @@ public class ScheduleController {
             ArrayList<ArrayList<Object>> sessioSlots = new ArrayList<>();
             ArrayList<ArrayList<Object>> sessionMeetings = new ArrayList<>(); // Per cada sessio, quines reunions poden tenir lloc
             ArrayList<ArrayList<Object>> meetingSessions = new ArrayList<>(); // Per cada reunio, a quines sessions pot tenir lloc
+            ArrayList<SimpleClass> predefinedMeetings = new ArrayList<>();
 
             for(var x : MainData.SharedInstance().getSessions())
             {
@@ -295,6 +459,18 @@ public class ScheduleController {
                 meetingCounter++;
             }
 
+            int counter = 0;
+            for(var meet : listOfScheduledMeetings)
+            {
+                if(meet.taula != -1) {
+                    predefinedMeetings.add(new SimpleClass(counter, meet.sessio, meet.slot));
+                    predefiniedMeet.add(true);
+                }
+                else
+                    predefiniedMeet.add(false);
+                counter++;
+            }
+
             try {
                 var result = Encoding.codificar(MainData.SharedInstance().getMeetings().size(), // nMeetings : Int
                         mainCounterSlots, // nSlots:Int
@@ -306,7 +482,8 @@ public class ScheduleController {
                         sessioSlots, // sessioSlots: Array[Array[Int]]
                         sessionMeetings, // sessionMeetings: Array[Array[Int]]
                         meetingSessions,// meetingSessions: Array[Array[Int]]
-                        meetingEntities);  // meetingEntities: Array[Array[Int]]
+                        meetingEntities,
+                        predefinedMeetings);  // meetingEntities: Array[Array[Int]]
 
 
                 Platform.runLater(() -> {
@@ -315,8 +492,10 @@ public class ScheduleController {
                         var sessioArray = result.get(i);
                         for (int j = 0; j < sessioArray.size(); j++) {
                             for (var meetPos : sessioArray.get(j)) {
-                                var meeting = listOfScheduledMeetings.get((int) meetPos);
-                                moveMeeting(tab, meeting, i, j);
+                                if(!predefiniedMeet.get((int) meetPos)) {
+                                    var meeting = listOfScheduledMeetings.get((int) meetPos);
+                                    moveMeeting(tab, meeting, i, j, true);
+                                }
                             }
                         }
                     }
@@ -328,22 +507,38 @@ public class ScheduleController {
             }
             return 1;
         });
-        ///nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Int], taulesXSessio : Array[Array[Int]], mettingXParticipant : Array[Array[Int]],  forbidden: Array[Array[Int]], sessioSlots: Array[Array[Int]] , sessionMeetings: Array[Array[Int]], meetingSessions: Array[Array[Int]], participants : Array[Array[Int]]
-
-
     }
 
-    private void moveMeeting(CustomTab currentTab, MeetingScheduled meet, int newSes, int newSlot)
+    private void moveMeeting(CustomTab currentTab, MeetingScheduled meet, int newSes, int newSlot, boolean add)
+    {
+        if(meet.sessio == -1)
+            meetingsVBox.getChildren().remove(meet.stackPane);
+        else {
+            meet.parent.getChildren().remove(meet.stackPane);
+            meet.parent = null;
+        }
+
+        if(add) {
+            currentTab.addMeeting(meet, newSlot);
+        }
+        meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot);
+        meet.sessio = newSes;
+        meet.slot = newSlot-1;
+    }
+
+    private void moveMeeting(VBox list, MeetingScheduled meet, int newSes, int newSlot, boolean add)
     {
         if(meet.sessio == -1)
             meetingsVBox.getChildren().remove(meet.stackPane);
         else
             listOfTabs.get(meet.sessio).gridPane.getChildren().remove(meet.stackPane);
 
-        currentTab.addMeeting(meet, newSlot);
-        meet.hour = MainData.SharedInstance().getSessions().get(newSlot).getSlots().get(newSlot);
-        meet.sessio = newSes;
-        meet.slot = newSlot;
+        if(add) {
+            list.getChildren().add(meet.stackPane);
+            meet.sessio = -1;
+            meet.taula = -1;
+            meet.hour = null;
+        }
     }
 
     public void savePartialSolution()
