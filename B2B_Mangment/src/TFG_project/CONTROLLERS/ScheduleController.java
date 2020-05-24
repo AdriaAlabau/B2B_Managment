@@ -16,9 +16,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ScheduleController {
@@ -30,6 +33,7 @@ public class ScheduleController {
         public int id = 0;
         public int sessio = -1;
         public int slot = -1;
+        public String hour = null;
         public int taula = -1;
     }
 
@@ -110,6 +114,7 @@ public class ScheduleController {
                 i++;
             }
 
+            meet.taula = i;
             gridPane.add(meet.stackPane, i, slot+1);
             GridPane.setMargin(meet.stackPane, new Insets(5, 5, 5, 5));
         }
@@ -157,6 +162,38 @@ public class ScheduleController {
                 MeetingScheduled meetingScheduled = new MeetingScheduled();
                 meetingScheduled.stackPane= new StackPane();
                 meetingScheduled.stackPane.setStyle("-fx-background-color: darkGrey" );
+                meetingScheduled.stackPane.setId(String.valueOf(j));
+
+                meetingScheduled.stackPane.setOnMouseClicked(event -> {
+                    if (event.getButton() == MouseButton.PRIMARY
+                            && event.getClickCount() == 2) {
+
+                        String pos = ((StackPane) event.getSource()).getId();
+                        MeetingScheduled meeting = listOfScheduledMeetings.get(Integer.parseInt(pos));
+
+                        Stage meetingDetail = new Stage();
+                        meetingDetail.initModality(Modality.APPLICATION_MODAL);
+                        meetingDetail.initOwner(tabPane.getScene().getWindow());
+
+                        try {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_scheduled_detail.fxml"));
+                            Parent root = (Parent) fxmlLoader.load();
+                            MeetingScheduledDetailController controller = fxmlLoader.<MeetingScheduledDetailController>getController();
+                            controller.setMeeting(meeting.meeting.sessio, meeting.sessio, meeting.hour, meeting.taula, meeting.meeting.listOfParticipants);
+
+
+                            Scene scene = new Scene(root);
+                            meetingDetail.setMinWidth(root.minWidth(-1));
+                            meetingDetail.setMinHeight(root.minHeight(-1));
+                            meetingDetail.setScene(scene);
+
+                            meetingDetail.show();
+
+                        } catch (IOException e) {
+                            int x = 0;
+                        }
+                    }
+                });
 
                 String meetingName = meet.listOfParticipants.get(0) + " - " + meet.listOfParticipants.get(1) + ( meet.listOfParticipants.size() > 2 ?  "..." : "");
                 Label label = new Label(meetingName);
@@ -279,11 +316,9 @@ public class ScheduleController {
                         for (int j = 0; j < sessioArray.size(); j++) {
                             for (var meetPos : sessioArray.get(j)) {
                                 var meeting = listOfScheduledMeetings.get((int) meetPos);
-                                meetingsVBox.getChildren().remove(meeting.stackPane);
-                                tab.addMeeting(meeting, j);
+                                moveMeeting(tab, meeting, i, j);
                             }
                         }
-
                     }
                 });
             }
@@ -296,6 +331,19 @@ public class ScheduleController {
         ///nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Int], taulesXSessio : Array[Array[Int]], mettingXParticipant : Array[Array[Int]],  forbidden: Array[Array[Int]], sessioSlots: Array[Array[Int]] , sessionMeetings: Array[Array[Int]], meetingSessions: Array[Array[Int]], participants : Array[Array[Int]]
 
 
+    }
+
+    private void moveMeeting(CustomTab currentTab, MeetingScheduled meet, int newSes, int newSlot)
+    {
+        if(meet.sessio == -1)
+            meetingsVBox.getChildren().remove(meet.stackPane);
+        else
+            listOfTabs.get(meet.sessio).gridPane.getChildren().remove(meet.stackPane);
+
+        currentTab.addMeeting(meet, newSlot);
+        meet.hour = MainData.SharedInstance().getSessions().get(newSlot).getSlots().get(newSlot);
+        meet.sessio = newSes;
+        meet.slot = newSlot;
     }
 
     public void savePartialSolution()

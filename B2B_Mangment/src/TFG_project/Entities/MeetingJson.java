@@ -1,18 +1,19 @@
 package TFG_project.Entities;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MeetingJson {
     public String sessio;
-    public List<String> listOfParticipants;
+    public LinkedList<String> listOfParticipants;
 
     public MeetingJson(Meeting ent)
     {
         sessio = ent.getSessio();
         listOfParticipants = ent.getListOfParticipants();
     }
-    public MeetingJson(String s, List<String> meetings)
+    public MeetingJson(String s, LinkedList<String> meetings)
     {
         sessio = s;
         listOfParticipants = meetings;

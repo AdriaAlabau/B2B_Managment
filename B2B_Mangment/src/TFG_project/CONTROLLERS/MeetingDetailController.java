@@ -67,7 +67,7 @@ public class MeetingDetailController {
     public void addNewMeeting()
     {
         TextField newTF = new TextField("");
-        newTF.setPromptText("Set Entity Name...");
+        newTF.setPromptText("Set Entity Id...");
         Label newLabel = new Label(String.valueOf(newMettingsGroup.getRowCount()+1) + ".");
         extraMeetings.add(newTF);
         extraLabels.add(newLabel);
@@ -79,7 +79,7 @@ public class MeetingDetailController {
     public void addNewMeeting(String participant)
     {
         TextField newTF = new TextField("");
-        newTF.setPromptText("Set Entity Name...");
+        newTF.setPromptText("Set Entity Id...");
         newTF.setText(participant);
         var i = newMettingsGroup.getRowCount() == 0 ? newMettingsGroup.getRowCount() : 0;
         Label newLabel = new Label(String.valueOf(newMettingsGroup.getRowCount() +1 ) + ".");

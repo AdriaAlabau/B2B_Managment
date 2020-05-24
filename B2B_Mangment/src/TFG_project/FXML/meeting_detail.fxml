@@ -14,7 +14,7 @@
 
 <VBox fx:id="mainVBox" minHeight="350.0" minWidth="350.0" style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.MeetingDetailController">
     <children>
-        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" style="-fx-font-family: arialBlack;" styleClass="title1" text="Entity Detail">
+        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" style="-fx-font-family: arialBlack;" styleClass="title1" text="Meeting Detail">
             <padding>
                 <Insets left="10.0" />
             </padding>
