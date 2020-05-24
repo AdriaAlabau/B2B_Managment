@@ -2,6 +2,7 @@ package TFG_project.CONTROLLERS;
 
 import TFG_project.Entities.*;
 import TFG_project.HELPERS.AlertDialog;
+import TFG_project.HELPERS.WorkIndicatorDialog;
 import TFG_project.SCALA.Encoding;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -178,109 +179,121 @@ public class ScheduleController {
 
     public void computeSchedule()
     {
-        ///nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Int], taulesXSessio : Array[Array[Int]], mettingXParticipant : Array[Array[Int]],  forbidden: Array[Array[Int]], sessioSlots: Array[Array[Int]] , sessionMeetings: Array[Array[Int]], meetingSessions: Array[Array[Int]], participants : Array[Array[Int]]
 
-        HashMap<String, Integer> entitiesIdToPos = new HashMap<>();
-        int posEntity = 0;
-        int posSlot = 0;
-        int mainCounterSlots = 0;
+        WorkIndicatorDialog wd = new WorkIndicatorDialog(meetingsVBox.getScene().getWindow(), "Computing schedule...");
 
-        ArrayList<Object> nAttendeesParticipant = new ArrayList<>();
-        ArrayList<Object> taulesXSessio = new ArrayList<>();
-        ArrayList<ArrayList<Object>> entityMeetings = new ArrayList<>();
-        ArrayList<ArrayList<Object>> meetingEntities = new ArrayList<>();
-        ArrayList<ArrayList<Object>> forbidden = new ArrayList<>();
-        ArrayList<ArrayList<Object>> sessioSlots = new ArrayList<>();
-        ArrayList<ArrayList<Object>> sessionMeetings = new ArrayList<>(); // Per cada sessio, quines reunions poden tenir lloc
-        ArrayList<ArrayList<Object>> meetingSessions = new ArrayList<>(); // Per cada reunio, a quines sessions pot tenir lloc
+        wd.addTaskEndNotification(result -> {
+             // don't keep the object, cleanup
+        });
 
-        for(var x : MainData.SharedInstance().getSessions())
-        {
-            taulesXSessio.add(x.getListOfTables().size());
-            ArrayList<Object> listOfSlots = new ArrayList<>();
-            for(var slot : x.getSlots())
+        wd.exec("", inputParam -> {
+
+            HashMap<String, Integer> entitiesIdToPos = new HashMap<>();
+            int posEntity = 0;
+            int posSlot = 0;
+            int mainCounterSlots = 0;
+
+            ArrayList<Object> nAttendeesParticipant = new ArrayList<>();
+            ArrayList<Object> taulesXSessio = new ArrayList<>();
+            ArrayList<ArrayList<Object>> entityMeetings = new ArrayList<>();
+            ArrayList<ArrayList<Object>> meetingEntities = new ArrayList<>();
+            ArrayList<ArrayList<Object>> forbidden = new ArrayList<>();
+            ArrayList<ArrayList<Object>> sessioSlots = new ArrayList<>();
+            ArrayList<ArrayList<Object>> sessionMeetings = new ArrayList<>(); // Per cada sessio, quines reunions poden tenir lloc
+            ArrayList<ArrayList<Object>> meetingSessions = new ArrayList<>(); // Per cada reunio, a quines sessions pot tenir lloc
+
+            for(var x : MainData.SharedInstance().getSessions())
             {
-                listOfSlots.add(posSlot);
-                posSlot++;
-            }
-            sessioSlots.add(listOfSlots);
-            mainCounterSlots += listOfSlots.size();
-            sessionMeetings.add(new ArrayList<>());
-        }
-
-        for(var x : MainData.SharedInstance().getEntities())
-        {
-            try {
-                nAttendeesParticipant.add(Integer.parseInt(x.attendees));
-            }
-            catch (Exception e)
-            {
-                nAttendeesParticipant.add(1);
-            }
-            entitiesIdToPos.put(x.id, posEntity);
-
-            forbidden.add( x.getForbbiden());
-
-            entityMeetings.add(new ArrayList<>());
-
-            posEntity++;
-        }
-
-        int meetingCounter = 0;
-        for(var x : MainData.SharedInstance().getMeetings())
-        {
-            var set = new ArrayList<Object>();
-
-            for(var j : x.listOfParticipants)
-            {
-                var entityPos =entitiesIdToPos.get(j);
-                set.add(entityPos);
-                entityMeetings.get(entityPos).add(meetingCounter);
-            }
-
-            meetingEntities.add(set);
-
-            meetingSessions.add(x.getSessions());
-
-            int finalMeetingCounter = meetingCounter;
-            x.getSessions().forEach(ses -> sessionMeetings.get((int)ses).add(finalMeetingCounter));
-
-            meetingCounter++;
-        }
-
-        try {
-            var result = Encoding.codificar(MainData.SharedInstance().getMeetings().size(), // nMeetings : Int
-                    mainCounterSlots, // nSlots:Int
-                    MainData.SharedInstance().getNSessions(),  //nSessions : Int
-                    nAttendeesParticipant, // nAttendeesParticipant : Array[Int]
-                    taulesXSessio, // taulesXSessio : Array[Array[Int]]
-                    entityMeetings,  // mettingXParticipant : Array[Array[Int]]
-                    forbidden,  //  forbidden: Array[Array[Int]]
-                    sessioSlots, // sessioSlots: Array[Array[Int]]
-                    sessionMeetings, // sessionMeetings: Array[Array[Int]]
-                    meetingSessions,// meetingSessions: Array[Array[Int]]
-                    meetingEntities);  // meetingEntities: Array[Array[Int]]
-
-
-            for (int i = 0; i< result.size(); i++)  {
-                var tab = listOfTabs.get(i);
-                var sessioArray = result.get(i);
-                for(int j = 0; j < sessioArray.size(); j++ )
+                taulesXSessio.add(x.getListOfTables().size());
+                ArrayList<Object> listOfSlots = new ArrayList<>();
+                for(var slot : x.getSlots())
                 {
-                    for(var meetPos : sessioArray.get(j))
-                    {
-                        var meeting = listOfScheduledMeetings.get((int)meetPos);
-                        meetingsVBox.getChildren().remove(meeting.stackPane);
-                        tab.addMeeting(meeting, j);
-                    }
+                    listOfSlots.add(posSlot);
+                    posSlot++;
+                }
+                sessioSlots.add(listOfSlots);
+                mainCounterSlots += listOfSlots.size();
+                sessionMeetings.add(new ArrayList<>());
+            }
+
+            for(var x : MainData.SharedInstance().getEntities())
+            {
+                try {
+                    nAttendeesParticipant.add(Integer.parseInt(x.attendees));
+                }
+                catch (Exception e)
+                {
+                    nAttendeesParticipant.add(1);
+                }
+                entitiesIdToPos.put(x.id, posEntity);
+
+                forbidden.add( x.getForbbiden());
+
+                entityMeetings.add(new ArrayList<>());
+
+                posEntity++;
+            }
+
+            int meetingCounter = 0;
+            for(var x : MainData.SharedInstance().getMeetings())
+            {
+                var set = new ArrayList<Object>();
+
+                for(var j : x.listOfParticipants)
+                {
+                    var entityPos =entitiesIdToPos.get(j);
+                    set.add(entityPos);
+                    entityMeetings.get(entityPos).add(meetingCounter);
                 }
 
+                meetingEntities.add(set);
+
+                meetingSessions.add(x.getSessions());
+
+                int finalMeetingCounter = meetingCounter;
+                x.getSessions().forEach(ses -> sessionMeetings.get((int)ses).add(finalMeetingCounter));
+
+                meetingCounter++;
             }
-        }
-        catch(Exception e)
-        {
-            int x = 0;
-        }
+
+            try {
+                var result = Encoding.codificar(MainData.SharedInstance().getMeetings().size(), // nMeetings : Int
+                        mainCounterSlots, // nSlots:Int
+                        MainData.SharedInstance().getNSessions(),  //nSessions : Int
+                        nAttendeesParticipant, // nAttendeesParticipant : Array[Int]
+                        taulesXSessio, // taulesXSessio : Array[Array[Int]]
+                        entityMeetings,  // mettingXParticipant : Array[Array[Int]]
+                        forbidden,  //  forbidden: Array[Array[Int]]
+                        sessioSlots, // sessioSlots: Array[Array[Int]]
+                        sessionMeetings, // sessionMeetings: Array[Array[Int]]
+                        meetingSessions,// meetingSessions: Array[Array[Int]]
+                        meetingEntities);  // meetingEntities: Array[Array[Int]]
+
+
+                Platform.runLater(() -> {
+                    for (int i = 0; i < result.size(); i++) {
+                        var tab = listOfTabs.get(i);
+                        var sessioArray = result.get(i);
+                        for (int j = 0; j < sessioArray.size(); j++) {
+                            for (var meetPos : sessioArray.get(j)) {
+                                var meeting = listOfScheduledMeetings.get((int) meetPos);
+                                meetingsVBox.getChildren().remove(meeting.stackPane);
+                                tab.addMeeting(meeting, j);
+                            }
+                        }
+
+                    }
+                });
+            }
+            catch(Exception e)
+            {
+                int x = 0;
+            }
+            return 1;
+        });
+        ///nMeetings : Int, nSlots: Int, nSessions : Int, nAttendeesParticipant : Array[Int], taulesXSessio : Array[Array[Int]], mettingXParticipant : Array[Array[Int]],  forbidden: Array[Array[Int]], sessioSlots: Array[Array[Int]] , sessionMeetings: Array[Array[Int]], meetingSessions: Array[Array[Int]], participants : Array[Array[Int]]
+
+
     }
 
     public void savePartialSolution()

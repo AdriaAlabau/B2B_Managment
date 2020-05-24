@@ -95,82 +95,123 @@ public class CreateNewController extends JFrame {
     @FXML
     protected void initialize() {
 
+        addNewMeetingParticipant();
+        addNewMeetingParticipant();
+
+        meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
+        preferedSessionChoiceBox.setItems(ListOfSessions);
+
+
+        entityTable.setRowFactory(tv -> {
+            TableRow<Entity> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+
+                    Entity clickedRow = row.getItem();
+
+                    Stage entityDetail = new Stage();
+                    entityDetail.initModality(Modality.APPLICATION_MODAL);
+                    entityDetail.initOwner(eventName.getScene().getWindow());
+
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
+                        Parent root = (Parent) fxmlLoader.load();
+                        EntityDetailController controller = fxmlLoader.<EntityDetailController>getController();
+                        controller.setEntity(clickedRow, arrayEntity);
+
+                        int width = MainData.SharedInstance().getNSessions() * 150 + 50;
+                        Scene scene = new Scene(root, Math.min(width, 1300), 750);
+                        entityDetail.setMinWidth(root.minWidth(-1));
+                        entityDetail.setMinHeight(root.minHeight(-1));
+                        entityDetail.setScene(scene);
+
+                        entityDetail.show();
+
+                    } catch (IOException e) {
+                        int x = 0;
+                    }
+                }
+            });
+            return row;
+        });
+
+        meetingsTableView.setRowFactory(tv -> {
+            TableRow<Meeting> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
+                        && event.getClickCount() == 2) {
+
+                    Meeting clickedRow = row.getItem();
+
+                    Stage meetingDetail = new Stage();
+                    meetingDetail.initModality(Modality.APPLICATION_MODAL);
+                    meetingDetail.initOwner(eventName.getScene().getWindow());
+
+                    try {
+                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_detail.fxml"));
+                        Parent root = (Parent) fxmlLoader.load();
+                        MeetingDetailController controller = fxmlLoader.<MeetingDetailController>getController();
+                        controller.setMeeting(clickedRow, arrayMeetings, ListOfSessions);
+
+
+                        Scene scene = new Scene(root, 400, 450);
+                        meetingDetail.setMinWidth(root.minWidth(-1));
+                        meetingDetail.setMinHeight(root.minHeight(-1));
+                        meetingDetail.setScene(scene);
+
+                        meetingDetail.show();
+
+                    } catch (IOException e) {
+                        int x = 0;
+                    }
+                }
+            });
+            return row;
+        });
+
+        eventName.textProperty().addListener((observable, oldValue, newValue) -> {
+            MainData.SharedInstance().setEventName(newValue);
+        });
+
+        eventLocation.textProperty().addListener((observable, oldValue, newValue) -> {
+            MainData.SharedInstance().setEventLocation(newValue);
+        });
+
+        numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            try {
+                MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
+
+                int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
+
+                ListOfSessions.subList(1, ListOfSessions.size()).clear();
+                for (int i = 0; i < Integer.parseInt(newValue); i++) {
+                    ListOfSessions.add("Session " + String.valueOf(i + 1));
+                }
+                preferedSessionChoiceBox.setItems(ListOfSessions);
+                preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
+            } catch (Exception e) {
+                int x = 0;
+                //SHOW alert
+            }
+        });
+
+        meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
+                                                                                                 ChangeListener<Number>() {
+                                                                                                     @Override
+                                                                                                     public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
+                                                                                                         String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
+
+                                                                                                         //sessio.setHoraInici(newValueStr);
+                                                                                                         var arry = newValueStr.split(" ");
+                                                                                                         MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
+                                                                                                     }
+                                                                                                 });
+
+        preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
+
         Platform.runLater(() -> {
-            addNewMeetingParticipant();
-            addNewMeetingParticipant();
-
-            meetingDurationChoiceBox.setItems(Constants.MEETINGDURATIONARRAY);
-            preferedSessionChoiceBox.setItems(ListOfSessions);
-
-
-            entityTable.setRowFactory(tv -> {
-                TableRow<Entity> row = new TableRow<>();
-                row.setOnMouseClicked(event -> {
-                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
-                            && event.getClickCount() == 2) {
-
-                        Entity clickedRow = row.getItem();
-
-                        Stage entityDetail = new Stage();
-                        entityDetail.initModality(Modality.APPLICATION_MODAL);
-                        entityDetail.initOwner(eventName.getScene().getWindow());
-
-                        try {
-                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/entity_detail.fxml"));
-                            Parent root = (Parent) fxmlLoader.load();
-                            EntityDetailController controller = fxmlLoader.<EntityDetailController>getController();
-                            controller.setEntity(clickedRow, arrayEntity);
-
-                            int width = MainData.SharedInstance().getNSessions() * 150 + 50;
-                            Scene scene = new Scene(root, Math.min(width, 1300), 750);
-                            entityDetail.setMinWidth(root.minWidth(-1));
-                            entityDetail.setMinHeight(root.minHeight(-1));
-                            entityDetail.setScene(scene);
-
-                            entityDetail.show();
-
-                        } catch (IOException e) {
-                            int x = 0;
-                        }
-                    }
-                });
-                return row;
-            });
-
-            meetingsTableView.setRowFactory(tv -> {
-                TableRow<Meeting> row = new TableRow<>();
-                row.setOnMouseClicked(event -> {
-                    if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY
-                            && event.getClickCount() == 2) {
-
-                        Meeting clickedRow = row.getItem();
-
-                        Stage meetingDetail = new Stage();
-                        meetingDetail.initModality(Modality.APPLICATION_MODAL);
-                        meetingDetail.initOwner(eventName.getScene().getWindow());
-
-                        try {
-                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/meeting_detail.fxml"));
-                            Parent root = (Parent) fxmlLoader.load();
-                            MeetingDetailController controller = fxmlLoader.<MeetingDetailController>getController();
-                            controller.setMeeting(clickedRow, arrayMeetings, ListOfSessions);
-
-
-                            Scene scene = new Scene(root, 400, 450);
-                            meetingDetail.setMinWidth(root.minWidth(-1));
-                            meetingDetail.setMinHeight(root.minHeight(-1));
-                            meetingDetail.setScene(scene);
-
-                            meetingDetail.show();
-
-                        } catch (IOException e) {
-                            int x = 0;
-                        }
-                    }
-                });
-                return row;
-            });
-
             if (isReseting) {
                 refillInformation();
                 isReseting = false;
@@ -178,47 +219,6 @@ public class CreateNewController extends JFrame {
                 meetingDurationChoiceBox.setValue(Constants.MEETINGDURATIONARRAY.get(1));
 
             }
-
-            eventName.textProperty().addListener((observable, oldValue, newValue) -> {
-                MainData.SharedInstance().setEventName(newValue);
-            });
-
-            eventLocation.textProperty().addListener((observable, oldValue, newValue) -> {
-                MainData.SharedInstance().setEventLocation(newValue);
-            });
-
-            numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
-
-                try {
-                    MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
-
-                    int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
-
-                    ListOfSessions.subList(1, ListOfSessions.size()).clear();
-                    for (int i = 0; i < Integer.parseInt(newValue); i++) {
-                        ListOfSessions.add("Session " + String.valueOf(i + 1));
-                    }
-                    preferedSessionChoiceBox.setItems(ListOfSessions);
-                    preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
-                } catch (Exception e) {
-                    int x = 0;
-                    //SHOW alert
-                }
-            });
-
-            meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
-                                                                                                     ChangeListener<Number>() {
-                                                                                                         @Override
-                                                                                                         public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                                                                                                             String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
-
-                                                                                                             //sessio.setHoraInici(newValueStr);
-                                                                                                             var arry = newValueStr.split(" ");
-                                                                                                             MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
-                                                                                                         }
-                                                                                                     });
-
-            preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
         });
 
     }
@@ -355,7 +355,7 @@ public class CreateNewController extends JFrame {
             try {
                 schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
                 scheduleStage.setTitle("Schedule");
-                int width = MainData.SharedInstance().GetMaxNTables() * 100 + 280 + 70;
+                int width = /*MainData.SharedInstance().GetMaxNTables()*/4 * 100 + 280 + 70;
                 int height = 700;
                 scheduleStage.setScene(new Scene(schedule, width,height));
 
