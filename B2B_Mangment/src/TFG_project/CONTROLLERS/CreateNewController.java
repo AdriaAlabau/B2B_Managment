@@ -198,16 +198,16 @@ public class CreateNewController extends JFrame {
         });
 
         meetingDurationChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new
-                                                                                                 ChangeListener<Number>() {
-                                                                                                     @Override
-                                                                                                     public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
-                                                                                                         String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
+             ChangeListener<Number>() {
+                 @Override
+                 public void changed(ObservableValue<? extends Number> observableValue, Number value, Number newValue) {
+                     String newValueStr = Constants.MEETINGDURATIONARRAY.get(newValue.intValue());
 
-                                                                                                         //sessio.setHoraInici(newValueStr);
-                                                                                                         var arry = newValueStr.split(" ");
-                                                                                                         MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
-                                                                                                     }
-                                                                                                 });
+                     //sessio.setHoraInici(newValueStr);
+                     var arry = newValueStr.split(" ");
+                     MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
+                 }
+             });
 
         preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
 
@@ -355,8 +355,8 @@ public class CreateNewController extends JFrame {
             try {
                 schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
                 scheduleStage.setTitle("Schedule");
-                int width = /*MainData.SharedInstance().GetMaxNTables()*/4 * 100 + 280 + 70;
-                int height = 700;
+                int width = MainData.SharedInstance().GetMaxNTables() * 170 + 270+ 87;
+                int height = MainData.SharedInstance().GetMaxSlots() * 40 + 90 + 85;
                 scheduleStage.setScene(new Scene(schedule, width,height));
 
                 scheduleStage.show();

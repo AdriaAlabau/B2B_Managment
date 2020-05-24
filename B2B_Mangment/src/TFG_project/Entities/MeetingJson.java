@@ -35,4 +35,16 @@ public class MeetingJson {
         }
         return lRet;
     }
+
+    public boolean containsEntity(String name)
+    {
+        boolean bRet = false;
+        int i = 0;
+        while(i<listOfParticipants.size() && !bRet)
+        {
+            bRet = listOfParticipants.get(i).contains(name);
+            i++;
+        }
+        return bRet;
+    }
 }

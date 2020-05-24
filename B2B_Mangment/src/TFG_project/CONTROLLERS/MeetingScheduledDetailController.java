@@ -73,8 +73,6 @@ public class MeetingScheduledDetailController {
         participantsVBox.getChildren().add(newLabel);
     }
 
-
-
     public void setMeeting(String preferredSession, int sessio, String hour, int tb, LinkedList<String> participants)
     {
         pSession = sessio == -1 ? preferredSession : String.valueOf(sessio);

@@ -99,6 +99,16 @@ public class MainData {
         return res;
     }
 
+    public int GetMaxSlots()
+    {
+        int res = -1;
+        for (var ses: sessions) {
+            int size = ses.getSlots().size();
+            res = size > res ? size : res;
+        }
+        return res;
+    }
+
     public int getNSessions()
     {
         return nSessions;

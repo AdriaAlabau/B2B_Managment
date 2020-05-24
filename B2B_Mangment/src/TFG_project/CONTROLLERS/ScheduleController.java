@@ -18,12 +18,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 public class ScheduleController {
@@ -33,6 +37,17 @@ public class ScheduleController {
     private final String bruh = "WILDACARD";
 
     private MeetingScheduled draggingMeeting;
+
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private ImageView searchButton;
+
+    private ArrayList<MeetingScheduled> listOfSearched;
+
+    private boolean hasSearched;
+
 
     private class MeetingScheduled
     {
@@ -75,6 +90,8 @@ public class ScheduleController {
             meetingsInSlots = new HashMap<>();
 
             scrollPane = new ScrollPane();
+            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToWidth(true);
             tab.setContent(scrollPane);
 
             gridPane = new GridPane();
@@ -121,7 +138,6 @@ public class ScheduleController {
                     }
                 }
             }
-
 
             scrollPane.setContent(gridPane);
         }
@@ -336,6 +352,40 @@ public class ScheduleController {
                 j++;
             }
 
+            listOfSearched = new ArrayList<>();
+
+            searchButton.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.PRIMARY
+                        && event.getClickCount() == 1) {
+
+                    if(!hasSearched)
+                    {
+                        String entityName = searchField.getText();
+
+                        listOfScheduledMeetings.forEach(meet -> {
+                            if(meet.meeting.containsEntity(entityName))
+                            {
+                                meet.stackPane.setStyle("-fx-background-color: dodgerBlue" );
+                                listOfSearched.add(meet);
+                            }
+                        });
+
+                        hasSearched = listOfSearched.size() > 0;
+                    }
+                }
+            });
+
+            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                if(hasSearched)
+                {
+                    listOfSearched.forEach(e->
+                    {
+                        e.stackPane.setStyle("-fx-background-color: darkGrey" );
+                    });
+                    listOfSearched.clear();
+                    hasSearched = false;
+                }
+            });
 
             meetingsVBox.setOnDragOver(new EventHandler<DragEvent>() {
                 public void handle(DragEvent event) {
