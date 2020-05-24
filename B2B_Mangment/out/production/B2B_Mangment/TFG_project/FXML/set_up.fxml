@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainLayout" minHeight="250.0" minWidth="350.0" prefHeight="261.0" prefWidth="487.0" spacing="5.0" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.SetUpController">
+<VBox fx:id="mainLayout" minHeight="250.0" minWidth="250.0" spacing="5.0" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.SetUpController">
    <children>
       <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="-Infinity" prefHeight="40.0" VBox.vgrow="NEVER">
          <children>
@@ -61,10 +61,10 @@
       </GridPane>
       <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="8.0" VBox.vgrow="NEVER">
          <children>
-            <Label text="Add new table config" visible="false" />
-            <TextField fx:id="newTableValue" alignment="CENTER_RIGHT" disable="true" prefHeight="27.0" prefWidth="43.0" visible="false" HBox.hgrow="NEVER" />
-            <Button disable="true" mnemonicParsing="false" onAction="#setNewTableValue" text="Add" visible="false" />
-            <Label text="Use * to add a custom table" visible="false">
+            <Label maxHeight="0.0" maxWidth="0.0" text="Add new table config" visible="false" />
+            <TextField fx:id="newTableValue" alignment="CENTER_RIGHT" disable="true" maxWidth="0.0" prefHeight="27.0" prefWidth="0.0" visible="false" HBox.hgrow="NEVER" />
+            <Button disable="true" maxWidth="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#setNewTableValue" prefWidth="0.0" text="Add" visible="false" />
+            <Label maxWidth="0.0" minWidth="0.0" text="Use * to add a custom table" visible="false">
                <font>
                   <Font size="11.0" />
                </font>

@@ -373,7 +373,7 @@ public class CreateNewController extends JFrame {
     public void addNewMeetingParticipant()
     {
         TextField newTF = new TextField("");
-        newTF.setPromptText("Set Entity Id...");
+        newTF.setPromptText("Set Entity Name...");
         Label newLabel = new Label(String.valueOf(newMettingsGroup.getRowCount()+1) + ".");
         extraMeetings.add(newTF);
         extraLabels.add(newLabel);
@@ -475,7 +475,7 @@ public class CreateNewController extends JFrame {
 
             //get
 
-            for (int i = extraMeetings.size() - 1; i >= 0; i--) {
+            for (int i = 0; i < extraMeetings.size(); i++) {
                 if (!extraMeetings.get(i).getText().isEmpty()) {
                     currentMeeting.addMetting(extraMeetings.get(i).getText());
                 }

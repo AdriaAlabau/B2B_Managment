@@ -158,7 +158,8 @@ public class ScheduleController {
                 meetingScheduled.stackPane= new StackPane();
                 meetingScheduled.stackPane.setStyle("-fx-background-color: darkGrey" );
 
-                Label label = new Label("Meeting " + j);
+                String meetingName = meet.listOfParticipants.get(0) + " - " + meet.listOfParticipants.get(1) + ( meet.listOfParticipants.size() > 2 ?  "..." : "");
+                Label label = new Label(meetingName);
 
                 meetingScheduled.stackPane.getChildren().add(label);
                 meetingScheduled.stackPane.setPadding(new Insets(5,5,5,5));
@@ -204,7 +205,7 @@ public class ScheduleController {
 
             for(var x : MainData.SharedInstance().getSessions())
             {
-                taulesXSessio.add(x.getListOfTables().size());
+                taulesXSessio.add(x.getListOfTables().get(0).nUnits);
                 ArrayList<Object> listOfSlots = new ArrayList<>();
                 for(var slot : x.getSlots())
                 {
@@ -226,6 +227,7 @@ public class ScheduleController {
                     nAttendeesParticipant.add(1);
                 }
                 entitiesIdToPos.put(x.id, posEntity);
+                entitiesIdToPos.put(x.name, posEntity);
 
                 forbidden.add( x.getForbbiden());
 

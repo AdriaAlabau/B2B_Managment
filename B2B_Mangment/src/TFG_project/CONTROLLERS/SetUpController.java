@@ -214,7 +214,7 @@ public class SetUpController {
     {
         for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
         {
-            //MainData.SharedInstance().setSession(i, columns.get(i).saveAndGetSessio());
+            MainData.SharedInstance().setSession(i, columns.get(i).saveAndGetSessio());
         }
         Stage stage = (Stage) sessionsGridPane.getScene().getWindow();
         // do what you have to do
