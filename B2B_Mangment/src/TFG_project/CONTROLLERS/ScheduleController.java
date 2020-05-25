@@ -32,9 +32,9 @@ import java.util.*;
 
 public class ScheduleController {
 
-    private final DataFormat stackPaneFormat = new DataFormat("STACKPANE");
+    private static final DataFormat stackPaneFormat = new DataFormat("STACKPANE");
 
-    private final String bruh = "WILDACARD";
+    private static final String bruh = "WILDACARD";
 
     private MeetingScheduled draggingMeeting;
 
@@ -271,7 +271,7 @@ public class ScheduleController {
             {
                 MeetingScheduled meetingScheduled = new MeetingScheduled();
                 meetingScheduled.stackPane= new StackPane();
-                meetingScheduled.stackPane.setStyle("-fx-background-color: darkGrey" );
+                meetingScheduled.stackPane.setStyle("-fx-background-color: darkGrey; -fx-border-color: black;" );
                 meetingScheduled.stackPane.setId(String.valueOf(j));
 
                 meetingScheduled.stackPane.setOnMouseClicked(event -> {
@@ -310,7 +310,8 @@ public class ScheduleController {
 
                 meetingScheduled.stackPane.getChildren().add(label);
                 meetingScheduled.stackPane.setPadding(new Insets(5,5,5,5));
-                GridPane.setMargin(meetingScheduled.stackPane, new Insets(5,5,5,5));
+                //GridPane.setMargin(meetingScheduled.stackPane, new Insets(5,5,5,5));
+                meetingScheduled.stackPane.managedProperty().bind(meetingScheduled.stackPane.visibleProperty());
 
                 meetingScheduled.stackPane.setAlignment(Pos.CENTER);
 
@@ -365,7 +366,7 @@ public class ScheduleController {
                         listOfScheduledMeetings.forEach(meet -> {
                             if(meet.meeting.containsEntity(entityName))
                             {
-                                meet.stackPane.setStyle("-fx-background-color: dodgerBlue" );
+                                meet.stackPane.setStyle("-fx-background-color: dodgerBlue; -fx-border-color: black;" );
                                 listOfSearched.add(meet);
                             }
                         });
@@ -380,7 +381,7 @@ public class ScheduleController {
                 {
                     listOfSearched.forEach(e->
                     {
-                        e.stackPane.setStyle("-fx-background-color: darkGrey" );
+                        e.stackPane.setStyle("-fx-background-color: darkGrey;  -fx-border-color: black;" );
                     });
                     listOfSearched.clear();
                     hasSearched = false;
@@ -420,6 +421,29 @@ public class ScheduleController {
                     event.setDropCompleted(success);
 
                     event.consume();
+                }
+            });
+
+            tabPane.getSelectionModel().selectedIndexProperty().addListener( (observable, oldValue, newValue) -> {
+                int selectedIndex = newValue.intValue();
+                //where index of the first tab is 0, while that of the second tab is 1 and so on.
+                listOfScheduledMeetings.forEach(meet -> {
+                    if(meet.taula == -1) {
+                        if (meet.meeting.sessio == "All")
+                            meet.stackPane.setVisible(true);
+                        else
+                            meet.stackPane.setVisible(meet.meeting.sessio.contains(String.valueOf(selectedIndex +1)));
+                    }
+                });
+            });
+
+            listOfScheduledMeetings.forEach(meet -> {
+                if(meet.taula == -1) {
+                    if (meet.meeting.sessio == "All")
+                        meet.stackPane.setVisible(true);
+                    else
+                        meet.stackPane.setVisible(meet.meeting.sessio.contains(String.valueOf( 1)));
+
                 }
             });
         });
@@ -571,7 +595,7 @@ public class ScheduleController {
         if(add) {
             currentTab.addMeeting(meet, newSlot);
         }
-        meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot);
+        meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot-1);
         meet.sessio = newSes;
         meet.slot = newSlot-1;
     }

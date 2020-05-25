@@ -108,33 +108,45 @@ public class MeetingDetailController {
 
     public void saveInfoAction()
     {
+        var previousEntities = currentMeeting.getListOfParticipants();
+        var previousText = currentMeeting.getEntities();
+        try{
+            int correct = 0;
+            int pos = 0;
+            while(correct < 2 && pos < extraMeetings.size())
+            {
+                if(!extraMeetings.get(pos).getText().isEmpty())
+                    correct++;
+                pos++;
+            }
+            if(correct>= 2) {
+                if (currentMeeting == null)
+                    currentMeeting = new Meeting();
 
-        int correct = 0;
-        int pos = 0;
-        while(correct < 2 && pos < extraMeetings.size())
-        {
-            if(!extraMeetings.get(pos).getText().isEmpty())
-                correct++;
-            pos++;
-        }
-        if(correct>= 2) {
-            if (currentMeeting == null)
-                currentMeeting = new Meeting();
+                currentMeeting.cleanListOfParticipants();
 
-            currentMeeting.setSessio((String) preferedSessionChoiceBox.getValue());
-
-            currentMeeting.cleanListOfParticipants();
-
-            for (int i = extraMeetings.size() - 1; i >= 0; i--) {
-                if (!extraMeetings.get(i).getText().isEmpty()) {
-                    currentMeeting.addMetting(extraMeetings.get(i).getText());
+                for (int i = extraMeetings.size() - 1; i >= 0; i--) {
+                    if (!extraMeetings.get(i).getText().isEmpty()) {
+                        currentMeeting.addMetting( extraMeetings.get(i).getText());
+                    }
                 }
 
+                currentMeeting.setSessio((String) preferedSessionChoiceBox.getValue());
+
+                closeView();
             }
-            closeView();
+            else
+                AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities in a meeting");
         }
-        else
-            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities in a meeting");
+        catch(Exception e)
+        {
+            if(e.getMessage().equals("Repeated")) {
+                currentMeeting.cleanListOfParticipants();
+                currentMeeting.getListOfParticipants().addAll(previousEntities);
+                currentMeeting.setEntities(previousText);
+                AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You entered the same participant twice");
+            }
+        }
 
 
 

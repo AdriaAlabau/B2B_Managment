@@ -175,28 +175,41 @@ public class EntityDetailController {
 
     public void saveInfoAction()
     {
-        currentEntity.setName(newEntityName.getText());
-        currentEntity.setId(newEntityId.getText());
-
         try{
             Integer.parseInt(newEntityNumber.getText());
+
+            var name = newEntityName.getText();
+            var id = newEntityId.getText();
+
+            if(!currentEntity.getName().equals(name) || !currentEntity.getId().equals(id)) {
+                for (var e : arrayEntity) {
+                    if(e != currentEntity)
+                        if (e.getName().equals(name) || e.getId().equals(id))
+                            throw new Exception("Repeated");
+                }
+            }
+
+            currentEntity.setName(name);
+            currentEntity.setId(id);
+
             currentEntity.setAttendees(newEntityNumber.getText());
+
+            LinkedList<SessioAttending> attendingSesions = new LinkedList<>();
+            for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
+            {
+                attendingSesions.add(columns.get(i).saveAndGetSessio());
+            }
+
+            currentEntity.setAttendingSessions(attendingSesions);
+
+            Stage stage = (Stage) mediumHBOX.getScene().getWindow();
+
+            stage.close();
         }
         catch (Exception e)
         {
-
+            if(e.getMessage().equals("Repeated"))
+                AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The entity is already on the list");
         }
-
-        LinkedList<SessioAttending> attendingSesions = new LinkedList<>();
-        for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
-        {
-            attendingSesions.add(columns.get(i).saveAndGetSessio());
-        }
-
-        currentEntity.setAttendingSessions(attendingSesions);
-
-        Stage stage = (Stage) mediumHBOX.getScene().getWindow();
-
-        stage.close();
     }
 }

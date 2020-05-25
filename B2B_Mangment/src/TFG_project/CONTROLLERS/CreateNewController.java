@@ -30,6 +30,8 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.io.*;
 import java.nio.file.Paths;
+import java.security.spec.ECField;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -339,30 +341,55 @@ public class CreateNewController extends JFrame {
     public void accessSchedule()
     {
 
-        if(arrayMeetings.size() > 0 && arrayEntity.size() > 1)
-        {
-            if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION,  null, "Do you want to save changes before moving forward?" ).get() == ButtonType.OK)
-            {
-                saveFile();
-            }
-
-            Stage scheduleStage = new Stage();
-
-            MainData.SharedInstance().setEntities(arrayEntity);
-            MainData.SharedInstance().setMeetingJson(arrayMeetings);
-
-            Parent schedule = null;
+        if(arrayMeetings.size() > 0 && arrayEntity.size() > 1) {
             try {
-                schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
-                scheduleStage.setTitle("Schedule");
-                int width = MainData.SharedInstance().GetMaxNTables() * 170 + 270+ 87;
-                int height = MainData.SharedInstance().GetMaxSlots() * 40 + 90 + 85;
-                scheduleStage.setScene(new Scene(schedule, width,height));
 
-                scheduleStage.show();
-                ((Stage)eventName.getScene().getWindow()).close();
-            } catch (IOException e) {
-                int x = 0;
+                for(var meet : arrayMeetings)
+                {
+                    for(var ent : meet.getListOfParticipants())
+                    {
+                        boolean found = false;
+                        for(var entity : arrayEntity)
+                        {
+                            if(entity.getName().equals(ent))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(!found)
+                            throw new Exception("NotFound");
+                    }
+                }
+
+
+                if (AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Do you want to save changes before moving forward?").get() == ButtonType.OK) {
+                    saveFile();
+                }
+
+                Stage scheduleStage = new Stage();
+
+                MainData.SharedInstance().setEntities(arrayEntity);
+                MainData.SharedInstance().setMeetingJson(arrayMeetings);
+
+                Parent schedule = null;
+                try {
+                    schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
+                    scheduleStage.setTitle("Schedule");
+                    int width = MainData.SharedInstance().GetMaxNTables() * 170 + 270 + 87;
+                    int height = MainData.SharedInstance().GetMaxSlots() * 40 + 90 + 85;
+                    scheduleStage.setScene(new Scene(schedule, width, height));
+
+                    scheduleStage.show();
+                    ((Stage) eventName.getScene().getWindow()).close();
+                } catch (IOException e) {
+                    int x = 0;
+                }
+            }
+            catch (Exception e)
+            {
+                if(e.getMessage().equals("NotFound"))
+                    AlertDialog.showMessage(Alert.AlertType.ERROR, null, "At least one participant of one meeting isn't part of the entities list, make sure all the entities are loaded");
             }
         }
         else
@@ -425,6 +452,13 @@ public class CreateNewController extends JFrame {
                 try{
 
                     Integer.parseInt(newEntityNumber.getText());
+                    var id = newEntityId.getText();
+                    var name = newEntityName.getText();
+                    for(var e : arrayEntity)
+                    {
+                        if(e.getName().equals(name) || e.getId().equals(id))
+                            throw new Exception("Repeated");
+                    };
 
                     if (currentEntity == null)
                         currentEntity = new Entity(MainData.SharedInstance().getSessions());
@@ -446,7 +480,10 @@ public class CreateNewController extends JFrame {
                 }
                 catch(Exception e)
                 {
-                    AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The field number of attendees must be a number");
+                    if(e.getMessage().equals("Repeated"))
+                        AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The entity is already on the list");
+                    else
+                        AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The field number of attendees must be a number");
                 }
             }
             else
@@ -458,44 +495,78 @@ public class CreateNewController extends JFrame {
 
     public void addMeetingToTable()
     {
-        int correct = 0;
-        int pos = 0;
-        while(correct < 2 && pos < extraMeetings.size())
-        {
-            if(!extraMeetings.get(pos).getText().isEmpty())
-                correct++;
-            pos++;
-        }
-        if(correct>= 2) {
-            if (currentMeeting == null)
-                currentMeeting = new Meeting();
-
-            currentMeeting.setSessio((String) preferedSessionChoiceBox.getValue());
-            preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
-
-            //get
-
-            for (int i = 0; i < extraMeetings.size(); i++) {
-                if (!extraMeetings.get(i).getText().isEmpty()) {
-                    currentMeeting.addMetting(extraMeetings.get(i).getText());
-                }
-                if(i>1) {
-                    newMettingsGroup.getChildren().remove(extraMeetings.get(i));
-                    newMettingsGroup.getChildren().remove(extraLabels.get(i));
-                }
+        try {
+            int correct = 0;
+            int pos = 0;
+            while (correct < 2 && pos < extraMeetings.size()) {
+                if (!extraMeetings.get(pos).getText().isEmpty())
+                    correct++;
+                pos++;
             }
+            if (correct >= 2) {
+                if (currentMeeting == null)
+                    currentMeeting = new Meeting();
 
-            extraMeetings.subList(2, extraMeetings.size()).clear();
-            extraLabels.subList(2, extraLabels.size()).clear();
-            extraMeetings.get(0).setText("");
-            extraMeetings.get(1).setText("");
+                currentMeeting.setSessio((String) preferedSessionChoiceBox.getValue());
+                preferedSessionChoiceBox.setValue(ListOfSessions.get(0));
 
-            arrayMeetings.add(currentMeeting);
-            meetingsTableView.setItems(arrayMeetings);
-            currentMeeting = null;
+                //get
+
+                for (int i = 0; i < extraMeetings.size(); i++) {
+                    if (!extraMeetings.get(i).getText().isEmpty()) {
+                        var text = extraMeetings.get(i).getText();
+                        currentMeeting.addMetting(text);
+
+                    }
+                }
+
+                int index = 0;
+                int totalCorrectes = 0;
+                while(index < arrayEntity.size() && totalCorrectes<currentMeeting.getListOfParticipants().size())
+                {
+                    int subIndex = 0;
+                    boolean found = false;
+                    while (subIndex < currentMeeting.getListOfParticipants().size() && !found)
+                    {
+                        if(arrayEntity.get(index).getName().contains(currentMeeting.getListOfParticipants().get(subIndex)))
+                        {
+                            found = true;
+                            totalCorrectes++;
+                        }
+                        subIndex++;
+                    }
+                    index++;
+                }
+
+                if(totalCorrectes < currentMeeting.getListOfParticipants().size())
+                {
+                    if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "You have entered a participant that is not present in the entities list, do you want to continue?").get() == ButtonType.CANCEL)
+                    {
+                        throw new Exception("Cancel");
+                    }
+                }
+
+                newMettingsGroup.getChildren().removeAll(extraLabels.subList(2, extraLabels.size()));
+                newMettingsGroup.getChildren().removeAll(extraMeetings.subList(2, extraMeetings.size()));
+
+                extraMeetings.subList(2, extraMeetings.size()).clear();
+                extraLabels.subList(2, extraLabels.size()).clear();
+                extraMeetings.get(0).setText("");
+                extraMeetings.get(1).setText("");
+
+                arrayMeetings.add(currentMeeting);
+                meetingsTableView.setItems(arrayMeetings);
+                currentMeeting = null;
+            } else
+                AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities to create a meeting");
         }
-        else
-            AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You need at least two entities to create a meeting");
+        catch (Exception e)
+        {
+            currentMeeting.getListOfParticipants().clear();
+            if(e.getMessage().equals("Repeated"))
+                AlertDialog.showMessage(Alert.AlertType.WARNING, null, "You entered the same participant twice");
+
+        }
     }
 
 

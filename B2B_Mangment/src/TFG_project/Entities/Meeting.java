@@ -25,7 +25,15 @@ public class Meeting {
             setSessio(copy.sessio);
             listOfParticipants = new LinkedList<>();
 
-            copy.listOfParticipants.forEach(u -> addMetting(u));
+
+            copy.listOfParticipants.forEach(u ->
+            {
+                try {
+                    addMetting(u);
+                } catch (Exception e) {
+
+                }
+            });
 
         }
 
@@ -61,8 +69,10 @@ public class Meeting {
             setEntities("");
         }
 
-        public void addMetting(String met)
+        public void addMetting(String met) throws Exception
         {
+            if(listOfParticipants.contains(met))
+                throw new Exception("Repeated");
             if(listOfParticipants.size() == 0)
                 setEntities(met);
             else

@@ -75,7 +75,7 @@ public class MeetingScheduledDetailController {
 
     public void setMeeting(String preferredSession, int sessio, String hour, int tb, LinkedList<String> participants)
     {
-        pSession = sessio == -1 ? preferredSession : String.valueOf(sessio);
+        pSession = sessio == -1 ? preferredSession : String.valueOf(sessio + 1 );
         h = hour == null ? "--:--" : hour;
         taula = tb == -1 ? "--" : String.valueOf(tb);
         entities = participants;
