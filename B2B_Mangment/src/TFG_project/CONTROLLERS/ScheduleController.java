@@ -169,10 +169,11 @@ public class ScheduleController {
             Node n = getNodeFromGridPane(gridPane, x,y);
             if(n.getId().equals(bruh) && ((StackPane)n).getChildren().size() == 0)
             {
+
+                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), y, false);
                 StackPane pane = (StackPane)n;
                 pane.getChildren().add(meeting.stackPane);
                 meeting.parent = pane;
-                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), y, false);
                 draggingMeeting.taula = x;
                 return true;
             }
@@ -429,7 +430,7 @@ public class ScheduleController {
                 //where index of the first tab is 0, while that of the second tab is 1 and so on.
                 listOfScheduledMeetings.forEach(meet -> {
                     if(meet.taula == -1) {
-                        if (meet.meeting.sessio == "All")
+                        if (meet.meeting.sessio.equals("All"))
                             meet.stackPane.setVisible(true);
                         else
                             meet.stackPane.setVisible(meet.meeting.sessio.contains(String.valueOf(selectedIndex +1)));
@@ -439,7 +440,7 @@ public class ScheduleController {
 
             listOfScheduledMeetings.forEach(meet -> {
                 if(meet.taula == -1) {
-                    if (meet.meeting.sessio == "All")
+                    if (meet.meeting.sessio.equals("All"))
                         meet.stackPane.setVisible(true);
                     else
                         meet.stackPane.setVisible(meet.meeting.sessio.contains(String.valueOf( 1)));
@@ -604,8 +605,8 @@ public class ScheduleController {
     {
         if(meet.sessio == -1)
             meetingsVBox.getChildren().remove(meet.stackPane);
-        else
-            listOfTabs.get(meet.sessio).gridPane.getChildren().remove(meet.stackPane);
+        //else
+           // listOfTabs.get(meet.sessio).gridPane.getChildren().remove(meet.stackPane);
 
         if(add) {
             list.getChildren().add(meet.stackPane);
