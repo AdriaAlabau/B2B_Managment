@@ -100,7 +100,7 @@
                      <children>
                         <Label text="Entity Name" />
                         <Label prefHeight="23.0" prefWidth="46.0" text="Entity ID" GridPane.rowIndex="1" />
-                        <Label text="Number of atendees" GridPane.rowIndex="2" />
+                        <Label text="Number of attendees" GridPane.rowIndex="2" />
                         <TextField fx:id="newEntityName" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" />
                         <Label text="Entity Name" />
                         <TextField fx:id="newEntityId" prefHeight="27.0" prefWidth="118.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -232,6 +232,7 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" maxHeight="37.0" minHeight="37.0" prefHeight="37.0" prefWidth="1300.0" spacing="15.0" BorderPane.alignment="CENTER">
          <children>
+            <Button mnemonicParsing="false" onAction="#loadInstance" prefHeight="26.0" prefWidth="121.0" styleClass="custom_button" text="Load Instance" />
             <Button mnemonicParsing="false" onAction="#loadFile" prefHeight="26.0" prefWidth="75.0" styleClass="custom_button" text="Load" HBox.hgrow="NEVER" />
             <Button mnemonicParsing="false" onAction="#saveFile" prefHeight="27.0" prefWidth="78.0" styleClass="custom_button" text="Save" HBox.hgrow="NEVER" />
             <Button mnemonicParsing="false" onAction="#accessSchedule" prefHeight="27.0" prefWidth="75.0" styleClass="custom_button" text="Next" HBox.hgrow="NEVER" />

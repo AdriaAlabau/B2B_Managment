@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="400.0" minWidth="350.0" prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.ScheduleController">
+<BorderPane minHeight="150.0" minWidth="150.0" prefHeight="900.0" prefWidth="1300.0" style="-fx-background-color: lightGrey;" stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.ScheduleController">
    <center>
       <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
    </center>
@@ -39,7 +39,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="43.0" layoutY="99.0" prefHeight="774.0" prefWidth="245.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="43.0" layoutY="99.0" prefWidth="245.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
                <content>
                   <VBox fx:id="meetingsVBox" alignment="TOP_CENTER" spacing="10.0">
                      <padding>
@@ -73,7 +73,6 @@
          <children>
             <Button minWidth="50.0" mnemonicParsing="false" onAction="#goBackAction" styleClass="custom_button" text="Back" wrapText="true" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button maxHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#savePartialSolution" prefWidth="50.0" styleClass="custom_button" text="Save" wrapText="true" />
             <Button maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#computeSchedule" prefWidth="70.0" styleClass="custom_button" text="Compute" wrapText="true" />
          </children>
          <padding>

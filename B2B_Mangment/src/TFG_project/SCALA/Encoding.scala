@@ -79,7 +79,8 @@ object Encoding {
     //CONSTRAINT 1
     //Una entitat es pot trobar en reunions com a molt el seu nombre de participants
     for (p <- entityMeetings.indices; ts <- 0 until nSlots) {
-      e.addAMK((for (i <- entityMeetings(p)) yield (schedule(i)(ts))).toList, attendesXParticipan(p))
+      val list = (for (i <- entityMeetings(p)) yield (schedule(i)(ts))).toList
+      e.addAMK(list, attendesXParticipan(p))
     }
 
     for (p <- predef) {
@@ -113,8 +114,6 @@ object Encoding {
       e.addAMK((for (i <- sessioMeetings(tSes)) yield schedule(i)(tSlot)).toList, taulesXSessio(tSes))
       for(i <- sessioMeetings(tSes))
         System.out.println(schedule(i)(tSlot))
-
-      System.out.println("-----------------")
     }
 
 

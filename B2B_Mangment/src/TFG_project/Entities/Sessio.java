@@ -97,5 +97,19 @@ public class Sessio {
             }
         }
     }
+
+    public void setDebugInfo(int nTotalSlots, int duration, int nTables)
+    {
+        listOfTables.get(0).nUnits = nTables;
+        horaInici = "07:00";
+        var hFi = duration*nTotalSlots;
+        var m = (hFi % 60) ;
+        int h = ((int)(hFi / 60)  + 7 );
+
+        horaFi = (h> 9 ? "" : "0") + h +":" + (m>9 ? "" : "0" ) + m;
+        computeSlots();
+
+
+    }
 }
 

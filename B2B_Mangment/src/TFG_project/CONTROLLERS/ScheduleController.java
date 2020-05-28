@@ -148,33 +148,35 @@ public class ScheduleController {
             boolean cont = true;
             while(i<= nTaules && cont)
             {
-
                 Node n = getNodeFromGridPane(gridPane, i,slot+1);
                 if(n.getId().equals(bruh)) {
                     var node = (StackPane)n;
                     cont = node.getChildren().size() != 0;
-                    meet.taula = i;
-                    node.getChildren().add(meet.stackPane);
-                    meet.parent = node;
-                    meet.slot = slot;
-                    meet.sessio = sessioIndex;
+                    if(!cont) {
+                        meet.taula = i-1;
+                        node.getChildren().add(meet.stackPane);
+                        meet.parent = node;
+                        meet.slot = slot;
+                        meet.sessio = sessioIndex;
+                        meet.stackPane.setVisible(true);
+                    }
                 }
                 i++;
             }
         }
 
-        public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int x, int y)
+        public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int taula1, int slot1)
         {
 
-            Node n = getNodeFromGridPane(gridPane, x,y);
+            Node n = getNodeFromGridPane(gridPane, taula1,slot1);
             if(n.getId().equals(bruh) && ((StackPane)n).getChildren().size() == 0)
             {
 
-                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), y, false);
+                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), slot1-1, false);
                 StackPane pane = (StackPane)n;
                 pane.getChildren().add(meeting.stackPane);
                 meeting.parent = pane;
-                draggingMeeting.taula = x;
+                draggingMeeting.taula = taula1-1;
                 return true;
             }
             return false;
@@ -250,10 +252,10 @@ public class ScheduleController {
 
                                 Integer cIndex = GridPane.getColumnIndex(node);
                                 Integer rIndex = GridPane.getRowIndex(node);
-                                int x = cIndex == null ? 0 : cIndex;
-                                int y = rIndex == null ? 0 : rIndex;
+                                int taula1 = cIndex == null ? 0 : cIndex;
+                                int slot1 = rIndex == null ? 0 : rIndex;
 
-                                success = tab.addAtTable(tab, draggingMeeting, x, y);
+                                success = tab.addAtTable(tab, draggingMeeting, taula1, slot1);
 
                             }
 
@@ -306,7 +308,7 @@ public class ScheduleController {
                     }
                 });
 
-                String meetingName = meet.listOfParticipants.get(0) + " - " + meet.listOfParticipants.get(1) + ( meet.listOfParticipants.size() > 2 ?  "..." : "");
+                String meetingName = meet.listOfParticipants.get(0) + " - " + meet.listOfParticipants.get(1) + ( meet.listOfParticipants.size() > 2 ?  " - ..." : "");
                 Label label = new Label(meetingName);
 
                 meetingScheduled.stackPane.getChildren().add(label);
@@ -560,7 +562,12 @@ public class ScheduleController {
                         meetingEntities,
                         predefinedMeetings);  // meetingEntities: Array[Array[Int]]
 
-
+                if(result.isEmpty() && !meetingSessions.isEmpty())
+                {
+                    Platform.runLater(() -> {
+                        AlertDialog.showMessage(Alert.AlertType.ERROR, null, "There is no solution to the corresponding input data");
+                    });
+                }
                 Platform.runLater(() -> {
                     for (int i = 0; i < result.size(); i++) {
                         var tab = listOfTabs.get(i);
@@ -596,9 +603,9 @@ public class ScheduleController {
         if(add) {
             currentTab.addMeeting(meet, newSlot);
         }
-        meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot-1);
+        meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot);
         meet.sessio = newSes;
-        meet.slot = newSlot-1;
+        meet.slot = newSlot;
     }
 
     private void moveMeeting(VBox list, MeetingScheduled meet, int newSes, int newSlot, boolean add)

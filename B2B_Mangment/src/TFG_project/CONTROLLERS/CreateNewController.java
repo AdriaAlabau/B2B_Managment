@@ -3,6 +3,7 @@ package TFG_project.CONTROLLERS;
 import TFG_project.Entities.Entity;
 import TFG_project.Entities.MainData;
 import TFG_project.Entities.Meeting;
+import TFG_project.Entities.Sessio;
 import TFG_project.HELPERS.AlertDialog;
 import TFG_project.HELPERS.Constants;
 import TFG_project.SCALA.ScalAT;
@@ -252,6 +253,123 @@ public class CreateNewController extends JFrame {
         }
     }
 
+    ///ONLY FOR DEBUG PURPOSE
+    public void loadInstance()
+    {
+        try{
+
+            FileChooser fileChooser = new FileChooser();
+            File file  = fileChooser.showOpenDialog(eventName.getScene().getWindow());
+
+            if (file != null) {
+                try {
+
+                    Scanner myReader = new Scanner(file);
+                    String data = "";
+                    MainData newMain = new MainData();
+
+                    arrayEntity.clear();
+                    arrayMeetings.clear();
+
+                    //PRIMER APARTAT
+                    data = myReader.nextLine();
+                    var split = data.split(" = ");
+                    var nEnitities = Integer.parseInt(split[1].substring(0,split[1].length()-1));
+
+                    data = myReader.nextLine();
+                    split = data.split(" = ");
+                    var nMeetings = Integer.parseInt(split[1].substring(0,split[1].length()-1));
+
+                    data = myReader.nextLine();
+                    split = data.split(" = ");
+                    var nTables = Integer.parseInt(split[1].substring(0,split[1].length()-1));
+
+                    data = myReader.nextLine();
+                    split = data.split(" = ");
+                    var nTotalSlots = Integer.parseInt(split[1].substring(0,split[1].length()-1));
+
+                    data = myReader.nextLine();
+                    split = data.split(" = ");
+                    var nSlotsFirst = Integer.parseInt(split[1].substring(0,split[1].length()-1));
+
+                    //SEGON APARTAT
+                    newMain.setMeetingsDuration(30);
+                    if(nSlotsFirst == nTotalSlots) {
+                        newMain.setNSessions(1);
+                        newMain.getSessions().get(0).setDebugInfo(nTotalSlots, 10, nTables);
+                    }
+                    else
+                    {
+                        newMain.setNSessions(2);
+                        newMain.getSessions().get(0).setDebugInfo(nSlotsFirst, 10, nTables);
+                        newMain.getSessions().get(1).setDebugInfo(nTotalSlots - nSlotsFirst, 30, nTables);
+                    }
+
+                    myReader.nextLine();
+                    data = myReader.nextLine();
+                    data = data.substring(13);
+                    while(!data.equals("|];"))
+                    {
+                        data =data.substring(1);
+                        var list = data.split(", ");
+                        Meeting met = new Meeting();
+                        met.addMetting("Entity " +(list[0]));
+                        met.addMetting("Entity " +(list[1]));
+                        list[2] = list[2].substring(0,1);
+                        met.setSessio(list[2].equals("3") ? "All" : ("Session " + list[2]));
+                        arrayMeetings.add(met);
+                        data = myReader.nextLine();
+                    }
+                    //N Meetings per entitat (innecessari)
+                    myReader.nextLine();
+                    myReader.nextLine();
+
+                    //Fixats
+                    data= myReader.nextLine();
+                    data= myReader.nextLine();
+
+                    //forbiddens
+                    myReader.nextLine();
+                    data = myReader.nextLine();
+                    data = data.substring(13);
+                    int entityCounter = 1;
+                    while(!data.equals("];"))
+                    {
+                        Entity ent = new Entity(newMain.getSessions());
+                        ent.setName("Entity " + entityCounter);
+                        ent.setId(String.valueOf(entityCounter));
+
+                        var list = data.split(",");
+                        int i = 1;
+                        while(!list[i].contains("}"))
+                        {
+                            ent.cantAttend(Integer.valueOf(list[i]));
+                            i++;
+                        }
+
+                        entityCounter++;
+                        arrayEntity.add(ent);
+                        data = myReader.nextLine();
+                    }
+
+                    myReader.close();
+
+                    MainData.SharedInstance().replaceInfo(newMain);
+                    restartFromDebug();
+                }
+                catch(Exception e)
+                {
+                    AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The selected file doesn't have the correct format");
+                }
+            }
+
+        }
+        catch(Exception e)
+        {
+            int x = 0;
+        }
+    }
+
     public void loadFile()
     {
         try{
@@ -298,6 +416,17 @@ public class CreateNewController extends JFrame {
 
         arrayMeetings.clear();
         arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
+
+        entityTable.setItems(arrayEntity);
+        meetingsTableView.setItems(arrayMeetings);
+    }
+
+    private void restartFromDebug()
+    {
+        eventName.setText(MainData.SharedInstance().getEventName());
+        eventLocation.setText(MainData.SharedInstance().getEventLocation());
+        numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
+        meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
 
         entityTable.setItems(arrayEntity);
         meetingsTableView.setItems(arrayMeetings);

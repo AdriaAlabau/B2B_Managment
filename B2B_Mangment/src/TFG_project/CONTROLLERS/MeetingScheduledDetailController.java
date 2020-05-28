@@ -77,7 +77,7 @@ public class MeetingScheduledDetailController {
     {
         pSession = sessio == -1 ? preferredSession : String.valueOf(sessio + 1 );
         h = hour == null ? "--:--" : hour;
-        taula = tb == -1 ? "--" : String.valueOf(tb);
+        taula = tb == -1 ? "--" : String.valueOf(tb+1);
         entities = participants;
     }
 
