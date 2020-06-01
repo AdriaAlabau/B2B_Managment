@@ -50,6 +50,12 @@ public class EntityJson {
         return lRet;
     }
 
+    public boolean canAttend(int sessio, int slot)
+    {
+        if(listOfSessions.get(sessio).getAttending())
+            return  listOfSessions.get(sessio).getAttendingSet().get(slot).getR();
+        return false;
+    }
 
     public ArrayList<Object> getMeetings()
     {

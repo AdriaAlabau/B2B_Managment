@@ -4,6 +4,7 @@ import TFG_project.Entities.*;
 import TFG_project.HELPERS.AlertDialog;
 import TFG_project.HELPERS.SimpleClass;
 import TFG_project.HELPERS.WorkIndicatorDialog;
+import TFG_project.Main;
 import TFG_project.SCALA.Encoding;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -46,6 +47,8 @@ public class ScheduleController {
 
     private ArrayList<MeetingScheduled> listOfSearched;
 
+    private HashMap<String, EntityJson> entityDictionary;
+
     private boolean hasSearched;
 
 
@@ -59,6 +62,12 @@ public class ScheduleController {
         public int slot = -1;
         public String hour = null;
         public int taula = -1;
+    }
+
+    private class MeetingKeyPair
+    {
+        public MeetingScheduled meet = null;
+        public StackPane parent = null;
     }
 
     @FXML
@@ -79,7 +88,7 @@ public class ScheduleController {
         private GridPane gridPane;
         private Sessio sessio;
         private int nTaules = 0;
-        private HashMap<Integer, ArrayList<MeetingScheduled>> meetingsInSlots;
+        private HashMap<Integer, ArrayList<MeetingKeyPair>> meetingsInSlots;
 
         public CustomTab(Sessio ses, int i)
         {
@@ -135,6 +144,9 @@ public class ScheduleController {
                         pane.setPadding(new Insets(5,5,5,5));
                         pane.setId(bruh);
                         gridPane.add(pane, gridPane.getColumnCount()-1, wild+1);
+                        var keyValue = new MeetingKeyPair();
+                        keyValue.parent = pane;
+                        meetingsInSlots.get(wild).add(keyValue);
                     }
                 }
             }
@@ -144,22 +156,22 @@ public class ScheduleController {
 
         public void addMeeting(MeetingScheduled meet, int slot)
         {
-            int i = 1;
-            boolean cont = true;
-            while(i<= nTaules && cont)
+            int i = 0;
+            boolean cont = false;
+
+            var list = meetingsInSlots.get(slot);
+            for(var entrance : list)
             {
-                Node n = getNodeFromGridPane(gridPane, i,slot+1);
-                if(n.getId().equals(bruh)) {
-                    var node = (StackPane)n;
-                    cont = node.getChildren().size() != 0;
-                    if(!cont) {
-                        meet.taula = i-1;
-                        node.getChildren().add(meet.stackPane);
-                        meet.parent = node;
-                        meet.slot = slot;
-                        meet.sessio = sessioIndex;
-                        meet.stackPane.setVisible(true);
-                    }
+                if(entrance.meet == null)
+                {
+                    meet.taula = i;
+                    entrance.parent.getChildren().add(meet.stackPane);
+                    meet.parent = entrance.parent;
+                    meet.slot = slot;
+                    meet.sessio = sessioIndex;
+                    meet.stackPane.setVisible(true);
+                    entrance.meet = meet;
+                    break;
                 }
                 i++;
             }
@@ -167,19 +179,48 @@ public class ScheduleController {
 
         public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int taula1, int slot1)
         {
+            var slotLits = meetingsInSlots.get(slot1-1);
+            var position = slotLits.get(taula1-1);
 
-            Node n = getNodeFromGridPane(gridPane, taula1,slot1);
-            if(n.getId().equals(bruh) && ((StackPane)n).getChildren().size() == 0)
+            if(position.meet == null)
             {
+                for(var e : meeting.meeting.listOfParticipants)
+                {
+                    var entity = entityDictionary.get(e);
+                    if(!entity.canAttend(tabPane.getSelectionModel().getSelectedIndex(), slot1-1))
+                    {
+                        AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be avalible at that time");
+                        return false;
+                    }
+                    int totalCount = 0;
+                    for(var table : slotLits)
+                    {
+                        if(table.meet != null && table.meet != meeting && table.meet.meeting.listOfParticipants.contains(e))
+                            totalCount++;
+                    }
+                    if(totalCount >= Integer.parseInt(entity.attendees))
+                    {
+                        AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be able to attend that meeting, all his attendees are already in a meeting");
+                        return false;
+                    }
+                };
 
                 moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), slot1-1, false);
-                StackPane pane = (StackPane)n;
-                pane.getChildren().add(meeting.stackPane);
-                meeting.parent = pane;
-                draggingMeeting.taula = taula1-1;
+
+                position.parent.getChildren().add(meeting.stackPane);
+                position.meet = meeting;
+                meeting.parent = position.parent;
+                meeting.taula =taula1 -1;
+                meeting.stackPane.setVisible(true);
+
                 return true;
             }
             return false;
+        }
+
+        public void removeFromTable(int slot, int table)
+        {
+            meetingsInSlots.get(slot).get(table).meet = null;
         }
 
         public boolean canGoThere(int columna, int row)
@@ -210,6 +251,7 @@ public class ScheduleController {
             //SET ENTITIES AND MEETINGS TO VBOX
 
             listOfTabs = new ArrayList<>();
+            entityDictionary = new HashMap<>();
 
             listOfScheduledMeetings = new ArrayList<>();
             int i = 1;
@@ -355,6 +397,9 @@ public class ScheduleController {
 
                 j++;
             }
+
+
+            MainData.SharedInstance().getEntities().forEach(e -> entityDictionary.put(e.name,e));
 
             listOfSearched = new ArrayList<>();
 
@@ -596,6 +641,7 @@ public class ScheduleController {
         if(meet.sessio == -1)
             meetingsVBox.getChildren().remove(meet.stackPane);
         else {
+            currentTab.removeFromTable(meet.slot, meet.taula);
             meet.parent.getChildren().remove(meet.stackPane);
             meet.parent = null;
         }
@@ -612,8 +658,9 @@ public class ScheduleController {
     {
         if(meet.sessio == -1)
             meetingsVBox.getChildren().remove(meet.stackPane);
-        //else
-           // listOfTabs.get(meet.sessio).gridPane.getChildren().remove(meet.stackPane);
+        else {
+            listOfTabs.get(tabPane.getSelectionModel().getSelectedIndex()).removeFromTable(meet.slot, meet.taula);
+        }
 
         if(add) {
             list.getChildren().add(meet.stackPane);
