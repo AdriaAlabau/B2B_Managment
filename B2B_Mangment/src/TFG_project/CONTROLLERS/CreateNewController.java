@@ -296,12 +296,12 @@ public class CreateNewController extends JFrame {
                     newMain.setMeetingsDuration(30);
                     if(nSlotsFirst == nTotalSlots) {
                         newMain.setNSessions(1);
-                        newMain.getSessions().get(0).setDebugInfo(nTotalSlots, 10, nTables);
+                        newMain.getSessions().get(0).setDebugInfo(nTotalSlots, 30, nTables);
                     }
                     else
                     {
                         newMain.setNSessions(2);
-                        newMain.getSessions().get(0).setDebugInfo(nSlotsFirst, 10, nTables);
+                        newMain.getSessions().get(0).setDebugInfo(nSlotsFirst, 30, nTables);
                         newMain.getSessions().get(1).setDebugInfo(nTotalSlots - nSlotsFirst, 30, nTables);
                     }
 
@@ -321,16 +321,27 @@ public class CreateNewController extends JFrame {
                         data = myReader.nextLine();
                     }
                     //N Meetings per entitat (innecessari)
-                    myReader.nextLine();
-                    myReader.nextLine();
-
-                    //Fixats
-                    data= myReader.nextLine();
-                    data= myReader.nextLine();
-
-                    //forbiddens
-                    myReader.nextLine();
                     data = myReader.nextLine();
+                    while(data.equals("")) {
+                        data = myReader.nextLine();
+                    }
+
+                    while(!data.equals("")) {
+                        data = myReader.nextLine();
+                    }
+
+                    while(data.equals("")) {
+                        data = myReader.nextLine();
+                    }
+
+                    while(!data.equals("")) {
+                        data = myReader.nextLine();
+                    }
+
+                    while(data.equals("")) {
+                        data = myReader.nextLine();
+                    }
+
                     data = data.substring(13);
                     int entityCounter = 1;
                     while(!data.equals("];"))
@@ -338,13 +349,16 @@ public class CreateNewController extends JFrame {
                         Entity ent = new Entity(newMain.getSessions());
                         ent.setName("Entity " + entityCounter);
                         ent.setId(String.valueOf(entityCounter));
+                        ent.setAttendees("1");
 
-                        var list = data.split(",");
-                        int i = 1;
-                        while(!list[i].contains("}"))
-                        {
-                            ent.cantAttend(Integer.valueOf(list[i]));
-                            i++;
+                        if(!data.equals("{0,},")) {
+                            data = data.substring(1);
+                            var list = data.split(",");
+                            int i = 0;
+                            while (!list[i].contains("}")) {
+                                ent.cantAttend(Integer.valueOf(list[i]));
+                                i++;
+                            }
                         }
 
                         entityCounter++;

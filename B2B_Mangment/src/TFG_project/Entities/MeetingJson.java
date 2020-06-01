@@ -42,7 +42,7 @@ public class MeetingJson {
         int i = 0;
         while(i<listOfParticipants.size() && !bRet)
         {
-            bRet = listOfParticipants.get(i).contains(name);
+            bRet = listOfParticipants.get(i).equals(name);
             i++;
         }
         return bRet;

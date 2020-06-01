@@ -2,6 +2,7 @@ package TFG_project.Entities;
 
 import TFG_project.HELPERS.DateConverter;
 import TFG_project.HELPERS.Pair;
+import TFG_project.Main;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class Sessio {
         listOfTables.put(0,new TableForSession(0,1));
 
         slots = new LinkedList<>();
-        computeSlots();
+        computeSlots(MainData.SharedInstance().getMeetingsDuration());
     }
 
     public String getHoraInici() {
@@ -49,7 +50,7 @@ public class Sessio {
     public void setHoraFi(String horaFi) {
 
         this.horaFi = horaFi;
-        computeSlots();
+        computeSlots(MainData.SharedInstance().getMeetingsDuration());
     }
 
     public void setNTables(int nSeats, TableForSession tbs)
@@ -72,7 +73,7 @@ public class Sessio {
 
     public LinkedList<String> getSlots(){ return slots; }
 
-    private void computeSlots()
+    private void computeSlots(int meetingsDuration)
     {
         slots.clear();
         var strStart = horaInici.split(":");
@@ -82,12 +83,12 @@ public class Sessio {
         var strEnd = horaFi.split(":");
         int endHour = Integer.parseInt(strEnd[0]);
         int endMinute = Integer.parseInt(strEnd[1]);
-        int sep = MainData.SharedInstance().getMeetingsDuration();
+
 
         while(startHour < endHour || startMinute < endMinute)
         {
             slots.add(DateConverter.intToStrTime(startHour)+ ":" + DateConverter.intToStrTime(startMinute));
-            startMinute = startMinute + sep;
+            startMinute = startMinute + meetingsDuration;
             double res = ((double)startMinute) / 60;
             if(res >= 1)
             {
@@ -107,7 +108,7 @@ public class Sessio {
         int h = ((int)(hFi / 60)  + 7 );
 
         horaFi = (h> 9 ? "" : "0") + h +":" + (m>9 ? "" : "0" ) + m;
-        computeSlots();
+        computeSlots(duration);
 
 
     }

@@ -146,13 +146,13 @@ public class Entity {
     public void cantAttend(int posicio)
     {
         var size = listOfSessions.get(0).getAttendingSet().size();
-        if(listOfSessions.get(0).getAttendingSet().size() < posicio)
+        if(listOfSessions.get(0).getAttendingSet().size() <= posicio)
         {
-            listOfSessions.get(1).getAttendingSet().get(posicio-size-1).setR(false);
+            listOfSessions.get(1).getAttendingSet().get(posicio-size).setR(false);
         }
         else
         {
-            listOfSessions.get(0).getAttendingSet().get(posicio-1).setR(false);
+            listOfSessions.get(0).getAttendingSet().get(posicio).setR(false);
         }
     }
 }
