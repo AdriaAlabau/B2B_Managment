@@ -1,10 +1,9 @@
 package TFG_project.CONTROLLERS;
 
-import TFG_project.Entities.Entity;
-import TFG_project.Entities.MainData;
-import TFG_project.Entities.Sessio;
-import TFG_project.Entities.TableForSession;
+import TFG_project.Entities.*;
+import TFG_project.HELPERS.AlertDialog;
 import TFG_project.HELPERS.Constants;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -41,8 +40,12 @@ public class SetUpController {
 
     private LinkedList<Integer> tableValues;
 
+    private ObservableList<Entity> arrayEntity;
+    private ObservableList<Meeting> arrayMeetings;
+
     class SessionColumn
     {
+        public int position;
         public Label title;
         public DatePicker datePicker;
         public ChoiceBox<String> startHour;
@@ -56,6 +59,7 @@ public class SetUpController {
         {
             sessio = ses;
             title = new Label("Session " + i);
+            position = i-1;
 
             tablesConfig = new LinkedList<>();
 
@@ -109,8 +113,15 @@ public class SetUpController {
         public Sessio saveAndGetSessio()
         {
             sessio.setDate(datePicker.getValue());
+            boolean needReset = !sessio.getHoraInici().equals(startHour.getValue()) || !sessio.getHoraFis().equals(endHour.getValue());
+
             sessio.setHoraInici(startHour.getValue());
             sessio.setHoraFi(endHour.getValue());
+            if(needReset) {
+                arrayEntity.forEach(e -> e.resetSession(position, sessio.getSlots()));
+                arrayMeetings.forEach(m -> m.resetTable(position));
+            }
+
             for (TextField tf: tablesConfig) {
                 try{
                     int value = Integer.parseInt(tf.getText());
@@ -119,7 +130,7 @@ public class SetUpController {
                 }
                 catch (Exception e)
                 {
-                    //TODO SHOW SOME ALERT MAYBE PUT RED AND UNDO WHEN VALUE CHECK TRUE
+
                 }
             }
             return sessio;
@@ -170,6 +181,12 @@ public class SetUpController {
 
     }
 
+    public void setEntites(ObservableList<Entity> arr, ObservableList<Meeting> meet)
+    {
+        arrayEntity = arr;
+        arrayMeetings = meet;
+    }
+
     @FXML
     protected void initialize() {
         int days = MainData.SharedInstance().getNSessions();
@@ -205,20 +222,23 @@ public class SetUpController {
 
             sessionsGridPane.getColumnConstraints().add(constr);
 
-
             columns.add(auxiliar);
         }
     }
 
     public void saveInfoAction()
     {
-        for(int i = 0; i<MainData.SharedInstance().getNSessions(); i++)
-        {
-            MainData.SharedInstance().setSession(i, columns.get(i).saveAndGetSessio());
+        boolean cont = true;
+        if(!arrayEntity.isEmpty() || !arrayMeetings.isEmpty())
+            cont = AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "If you have modified the duration of a session, this will modify the attending sessions from the entites already registred, do you want to continue?").get() == ButtonType.OK;
+        if(cont) {
+            for (int i = 0; i < MainData.SharedInstance().getNSessions(); i++) {
+                MainData.SharedInstance().setSession(i, columns.get(i).saveAndGetSessio());
+            }
+            Stage stage = (Stage) sessionsGridPane.getScene().getWindow();
+            // do what you have to do
+            stage.close();
         }
-        Stage stage = (Stage) sessionsGridPane.getScene().getWindow();
-        // do what you have to do
-        stage.close();
     }
 
     public void setNewTableValue()

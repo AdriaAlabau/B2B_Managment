@@ -12,6 +12,9 @@ public class Meeting {
         private SimpleStringProperty entities= new SimpleStringProperty("");
 
         private LinkedList<String> listOfParticipants;
+        private int nSessio = -1;
+        private int nSlot = -1;
+        private int nTaula = -1;
 
 
         public Meeting()
@@ -25,6 +28,9 @@ public class Meeting {
             setSessio(copy.sessio);
             listOfParticipants = new LinkedList<>();
 
+            nSessio = copy.nSessio;
+            nSlot = copy.nSlot;
+            nTaula = copy.nTaula;
 
             copy.listOfParticipants.forEach(u ->
             {
@@ -79,5 +85,54 @@ public class Meeting {
                 setEntities(getEntities()  + ", " +met);
             listOfParticipants.add(met);
         }
+
+        public int getNSessio(){
+            return nSessio;
+        }
+
+        public int getNSlot() {
+            return nSlot;
+        }
+
+        public int getNTaula(){
+            return nTaula;
+        }
+
+        public void saveTableInfo(int ses, int slot, int taula)
+        {
+            nSessio = ses;
+            nTaula = taula;
+            nSlot = slot;
+        }
+
+        public void resetSessio(int ses)
+        {
+            if(!sessio.get().equals("All"))
+            {
+                var list = sessio.get().split(" ");
+                if(Integer.parseInt(list[1]) > ses)
+                {
+                    sessio.setValue("All");
+                }
+            }
+
+            if(nSessio+1 > ses)
+            {
+                nSessio = -1;
+                nTaula = -1;
+                nSlot = -1;
+            }
+        }
+
+        public void resetTable(int ses)
+        {
+            if(ses == nSessio || ses == -1)
+            {
+                nSessio = -1;
+                nTaula = -1;
+                nSlot = -1;
+            }
+        }
+
 
     }

@@ -88,6 +88,8 @@ public class CreateNewController extends JFrame {
     private Entity currentEntity;
     private Meeting currentMeeting;
 
+    private boolean hideAlerts = false;
+
     public CreateNewController()
     {
         //
@@ -184,16 +186,30 @@ public class CreateNewController extends JFrame {
         numberOfSessions.textProperty().addListener((observable, oldValue, newValue) -> {
 
             try {
-                MainData.SharedInstance().setNSessions(Integer.parseInt(newValue));
-
-                int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
-
-                ListOfSessions.subList(1, ListOfSessions.size()).clear();
-                for (int i = 0; i < Integer.parseInt(newValue); i++) {
-                    ListOfSessions.add("Session " + String.valueOf(i + 1));
+                int value = Integer.parseInt(newValue);
+                boolean cont = true;
+                if((arrayEntity.size() > 0 || arrayMeetings.size() > 0 )&& !hideAlerts)
+                {
+                    cont = AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Updating the number of sessions will alter the attending sessions of the current entities").get() == ButtonType.OK;
                 }
-                preferedSessionChoiceBox.setItems(ListOfSessions);
-                preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
+                if(cont) {
+                    var previous = MainData.SharedInstance().getNSessions();
+                    if(previous != value) {
+                        MainData.SharedInstance().setNSessions(value);
+
+                        int last = preferedSessionChoiceBox.getSelectionModel().getSelectedIndex();
+
+                        ListOfSessions.subList(1, ListOfSessions.size()).clear();
+                        for (int i = 0; i < Integer.parseInt(newValue); i++) {
+                            ListOfSessions.add("Session " + String.valueOf(i + 1));
+                        }
+                        preferedSessionChoiceBox.setItems(ListOfSessions);
+                        preferedSessionChoiceBox.setValue(ListOfSessions.get(last >= ListOfSessions.size() ? 0 : last));
+
+                        arrayEntity.forEach(e -> e.updateNSessions(value));
+                        arrayMeetings.forEach(m -> m.resetSessio(value));
+                    }
+                }
             } catch (Exception e) {
                 int x = 0;
                 //SHOW alert
@@ -208,7 +224,26 @@ public class CreateNewController extends JFrame {
 
                      //sessio.setHoraInici(newValueStr);
                      var arry = newValueStr.split(" ");
-                     MainData.SharedInstance().setMeetingsDuration(Integer.parseInt(arry[0]));
+
+                     var previous = MainData.SharedInstance().getMeetingsDuration();
+                     var nextValue = Integer.parseInt(arry[0]);
+                     if(previous != nextValue)
+                     {
+                         boolean cont = true;
+                         if((!arrayEntity.isEmpty() || !arrayMeetings.isEmpty()) && !hideAlerts)
+                             cont = AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, "", "This will reset all attending information and any pre established meeting, do you want to continue?").get() == ButtonType.OK;
+                         if(cont)
+                         {
+                             MainData.SharedInstance().setMeetingsDuration(nextValue);
+                             MainData.SharedInstance().getSessions().forEach(ses -> ses.resetSlots(nextValue));
+                             arrayEntity.forEach(e -> e.resetAllSessions());
+                             arrayMeetings.forEach(m -> m.resetTable(-1));
+                         }
+                         else
+                         {
+                             meetingDurationChoiceBox.setValue(String.valueOf(previous) + " minutes");
+                         }
+                     }
                  }
              });
 
@@ -235,7 +270,11 @@ public class CreateNewController extends JFrame {
             setUpSessions.initOwner(eventName.getScene().getWindow());
             Parent setUp = null;
             try {
-                setUp = FXMLLoader.load(getClass().getResource("../FXML/set_up.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/set_up.fxml"));
+                setUp = (Parent) fxmlLoader.load();
+                SetUpController controller = fxmlLoader.<SetUpController>getController();
+                controller.setEntites(arrayEntity, arrayMeetings);
+
                 int width = MainData.SharedInstance().getNSessions() * 110+120;
                 int height = 345 + ((MainData.SharedInstance().getSessions().getFirst().getListOfTables().size() - 2)*40);
                 setUpSessions.setScene(new Scene(setUp, Math.min(Math.max(width,350), 1400),height ));
@@ -354,9 +393,9 @@ public class CreateNewController extends JFrame {
                         if(!data.equals("{0,},")) {
                             data = data.substring(1);
                             var list = data.split(",");
-                            int i = 0;
+                            int i = 1;
                             while (!list[i].contains("}")) {
-                                ent.cantAttend(Integer.valueOf(list[i]));
+                                ent.cantAttend(Integer.valueOf(list[i])-1);
                                 i++;
                             }
                         }
@@ -420,30 +459,35 @@ public class CreateNewController extends JFrame {
 
     private void refillInformation()
     {
+        hideAlerts = true;
         eventName.setText(MainData.SharedInstance().getEventName());
         eventLocation.setText(MainData.SharedInstance().getEventLocation());
         numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
         meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
 
-        arrayEntity.clear();
         arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
 
-        arrayMeetings.clear();
         arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
 
         entityTable.setItems(arrayEntity);
         meetingsTableView.setItems(arrayMeetings);
+        hideAlerts = false;
     }
 
     private void restartFromDebug()
     {
+        hideAlerts = true;
+
         eventName.setText(MainData.SharedInstance().getEventName());
         eventLocation.setText(MainData.SharedInstance().getEventLocation());
         numberOfSessions.setText(String.valueOf(MainData.SharedInstance().getNSessions()));
         meetingDurationChoiceBox.setValue(String.valueOf(MainData.SharedInstance().getMeetingsDuration()+ " minutes"));
 
+        arrayEntity.addAll(MainData.SharedInstance().getConvertedEntities());
+        arrayMeetings.addAll(MainData.SharedInstance().getConvertedMeetings());
         entityTable.setItems(arrayEntity);
         meetingsTableView.setItems(arrayMeetings);
+        hideAlerts = false;
     }
 
     public void resetInformation()
@@ -476,7 +520,7 @@ public class CreateNewController extends JFrame {
             }
 
         } catch (Exception e) {
-            AlertDialog.showMessage(Alert.AlertType.ERROR, null, "The selected file doesn't have the correct format");
+            AlertDialog.showMessage(Alert.AlertType.ERROR, null, "Error trying to save the file");
 
         }
     }
@@ -505,28 +549,30 @@ public class CreateNewController extends JFrame {
                     }
                 }
 
-
-                if (AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Do you want to save changes before moving forward?").get() == ButtonType.OK) {
+                var result = AlertDialog.askSave(Alert.AlertType.CONFIRMATION, null, "Do you want to save changes before moving forward?").get();
+                if (result == ButtonType.YES) {
                     saveFile();
                 }
 
-                Stage scheduleStage = new Stage();
+                if(result == ButtonType.YES || result == ButtonType.NO) {
+                    Stage scheduleStage = new Stage();
 
-                MainData.SharedInstance().setEntities(arrayEntity);
-                MainData.SharedInstance().setMeetingJson(arrayMeetings);
+                    MainData.SharedInstance().setEntities(arrayEntity);
+                    MainData.SharedInstance().setMeetingJson(arrayMeetings);
 
-                Parent schedule = null;
-                try {
-                    schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
-                    scheduleStage.setTitle("Schedule");
-                    int width = MainData.SharedInstance().GetMaxNTables() * 170 + 270 + 87;
-                    int height = MainData.SharedInstance().GetMaxSlots() * 40 + 90 + 85;
-                    scheduleStage.setScene(new Scene(schedule, width, height));
+                    Parent schedule = null;
+                    try {
+                        schedule = FXMLLoader.load(getClass().getResource("../FXML/schedule.fxml"));
+                        scheduleStage.setTitle("Schedule");
+                        int width = MainData.SharedInstance().GetMaxNTables() * 170 + 270 + 87;
+                        int height = MainData.SharedInstance().GetMaxSlots() * 40 + 90 + 85;
+                        scheduleStage.setScene(new Scene(schedule, width, height));
 
-                    scheduleStage.show();
-                    ((Stage) eventName.getScene().getWindow()).close();
-                } catch (IOException e) {
-                    int x = 0;
+                        scheduleStage.show();
+                        ((Stage) eventName.getScene().getWindow()).close();
+                    } catch (IOException e) {
+                        int x = 0;
+                    }
                 }
             }
             catch (Exception e)

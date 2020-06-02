@@ -65,4 +65,10 @@ public class SessioAttending {
     {
         return attendingSes;
     }
+
+    public void resetAttendingSet(List<String> slots)
+    {
+        attendingSes.clear();
+        slots.forEach(s -> attendingSes.add(new Pair(s, true)));
+    }
 }

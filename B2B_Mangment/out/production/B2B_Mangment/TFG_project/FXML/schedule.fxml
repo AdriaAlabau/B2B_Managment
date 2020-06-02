@@ -73,6 +73,7 @@
          <children>
             <Button minWidth="50.0" mnemonicParsing="false" onAction="#goBackAction" styleClass="custom_button" text="Back" wrapText="true" />
             <Pane HBox.hgrow="ALWAYS" />
+            <Button maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#savePartialSolution" prefWidth="70.0" styleClass="custom_button" text="Save" wrapText="true" />
             <Button maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#computeSchedule" prefWidth="70.0" styleClass="custom_button" text="Compute" wrapText="true" />
          </children>
          <padding>

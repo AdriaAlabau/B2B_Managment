@@ -6,6 +6,7 @@ import TFG_project.HELPERS.SimpleClass;
 import TFG_project.HELPERS.WorkIndicatorDialog;
 import TFG_project.Main;
 import TFG_project.SCALA.Encoding;
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,12 +24,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ScheduleController {
@@ -177,43 +181,47 @@ public class ScheduleController {
             }
         }
 
-        public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int taula1, int slot1)
+        public boolean addAtTable(CustomTab tab, MeetingScheduled meeting, int taula1, int slot1, boolean showAlerts)
         {
-            var slotLits = meetingsInSlots.get(slot1-1);
-            var position = slotLits.get(taula1-1);
+            try {
+                var slotLits = meetingsInSlots.get(slot1 - 1);
+                var position = slotLits.get(taula1 - 1);
 
-            if(position.meet == null)
+                if (position.meet == null) {
+                    for (var e : meeting.meeting.listOfParticipants) {
+                        var entity = entityDictionary.get(e);
+                        if (!entity.canAttend(tabPane.getSelectionModel().getSelectedIndex(), slot1 - 1)) {
+                            if (showAlerts)
+                                AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be avalible at that time");
+                            return false;
+                        }
+                        int totalCount = 0;
+                        for (var table : slotLits) {
+                            if (table.meet != null && table.meet != meeting && table.meet.meeting.listOfParticipants.contains(e))
+                                totalCount++;
+                        }
+                        if (totalCount >= Integer.parseInt(entity.attendees)) {
+                            if (showAlerts)
+                                AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be able to attend that meeting, all his attendees are already in a meeting");
+                            return false;
+                        }
+                    }
+
+
+                    moveMeeting(tab, meeting, tabPane.getSelectionModel().getSelectedIndex(), slot1 - 1, false);
+
+                    position.parent.getChildren().add(meeting.stackPane);
+                    position.meet = meeting;
+                    meeting.parent = position.parent;
+                    meeting.taula = taula1 - 1;
+                    meeting.stackPane.setVisible(true);
+
+                    return true;
+                }
+            }
+            catch(Exception e)
             {
-                for(var e : meeting.meeting.listOfParticipants)
-                {
-                    var entity = entityDictionary.get(e);
-                    if(!entity.canAttend(tabPane.getSelectionModel().getSelectedIndex(), slot1-1))
-                    {
-                        AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be avalible at that time");
-                        return false;
-                    }
-                    int totalCount = 0;
-                    for(var table : slotLits)
-                    {
-                        if(table.meet != null && table.meet != meeting && table.meet.meeting.listOfParticipants.contains(e))
-                            totalCount++;
-                    }
-                    if(totalCount >= Integer.parseInt(entity.attendees))
-                    {
-                        AlertDialog.showMessage(Alert.AlertType.INFORMATION, null, "The entity " + e + " won't be able to attend that meeting, all his attendees are already in a meeting");
-                        return false;
-                    }
-                };
-
-                moveMeeting(tab, draggingMeeting, tabPane.getSelectionModel().getSelectedIndex(), slot1-1, false);
-
-                position.parent.getChildren().add(meeting.stackPane);
-                position.meet = meeting;
-                meeting.parent = position.parent;
-                meeting.taula =taula1 -1;
-                meeting.stackPane.setVisible(true);
-
-                return true;
+                int x = 0;
             }
             return false;
         }
@@ -240,7 +248,6 @@ public class ScheduleController {
             }
             return null;
         }
-
     }
 
     @FXML
@@ -248,10 +255,9 @@ public class ScheduleController {
 
         Platform.runLater(() -> {
 
-            //SET ENTITIES AND MEETINGS TO VBOX
-
             listOfTabs = new ArrayList<>();
             entityDictionary = new HashMap<>();
+            MainData.SharedInstance().getEntities().forEach(e -> entityDictionary.put(e.name,e));
 
             listOfScheduledMeetings = new ArrayList<>();
             int i = 1;
@@ -297,7 +303,7 @@ public class ScheduleController {
                                 int taula1 = cIndex == null ? 0 : cIndex;
                                 int slot1 = rIndex == null ? 0 : rIndex;
 
-                                success = tab.addAtTable(tab, draggingMeeting, taula1, slot1);
+                                success = tab.addAtTable(tab, draggingMeeting, taula1, slot1, true);
 
                             }
 
@@ -359,11 +365,18 @@ public class ScheduleController {
                 meetingScheduled.stackPane.managedProperty().bind(meetingScheduled.stackPane.visibleProperty());
 
                 meetingScheduled.stackPane.setAlignment(Pos.CENTER);
-
-                meetingsVBox.getChildren().add(meetingScheduled.stackPane);
-
                 meetingScheduled.id = j;
                 meetingScheduled.meeting = meet;
+
+                if(meet.nSessio == -1)
+                    meetingsVBox.getChildren().add(meetingScheduled.stackPane);
+                else
+                {
+                    if(!listOfTabs.get(meet.nSessio).addAtTable(null, meetingScheduled, meet.nTaula+1, meet.nSlot+1,false))
+                    {
+                        meetingsVBox.getChildren().add(meetingScheduled.stackPane);
+                    }
+                }
 
                 listOfScheduledMeetings.add(meetingScheduled);
 
@@ -397,9 +410,6 @@ public class ScheduleController {
 
                 j++;
             }
-
-
-            MainData.SharedInstance().getEntities().forEach(e -> entityDictionary.put(e.name,e));
 
             listOfSearched = new ArrayList<>();
 
@@ -641,12 +651,14 @@ public class ScheduleController {
         if(meet.sessio == -1)
             meetingsVBox.getChildren().remove(meet.stackPane);
         else {
-            currentTab.removeFromTable(meet.slot, meet.taula);
-            meet.parent.getChildren().remove(meet.stackPane);
+            if(currentTab != null)
+                currentTab.removeFromTable(meet.slot, meet.taula);
+            if(meet.parent != null)
+                meet.parent.getChildren().remove(meet.stackPane);
             meet.parent = null;
         }
 
-        if(add) {
+        if(add && currentTab!=null) {
             currentTab.addMeeting(meet, newSlot);
         }
         meet.hour = MainData.SharedInstance().getSessions().get(newSes).getSlots().get(newSlot);
@@ -672,13 +684,57 @@ public class ScheduleController {
 
     public void savePartialSolution()
     {
+        //Obteim les dades i les guardem en un fitxer
+        try {
+            DirectoryChooser fileChooser = new DirectoryChooser();
+            File file  = fileChooser.showDialog(meetingsVBox.getScene().getWindow());
 
+            if (file != null) {
+
+                String dir = file.getAbsolutePath();
+                //This is where a real application would open the file.
+
+                for(int i = 0; i< listOfScheduledMeetings.size(); i++)
+                {
+                    var toSave = listOfScheduledMeetings.get(i);
+                    var fromMain = MainData.SharedInstance().getMeetings().get(toSave.id);
+                    fromMain.nSessio = toSave.sessio;
+                    fromMain.nTaula = toSave.taula;
+                    fromMain.nSlot = toSave.slot;
+                }
+
+                var path = Paths.get(dir, MainData.SharedInstance().getEventName() + "_save" + ".json");
+                FileWriter myWriter = new FileWriter(path.toString());
+
+                Gson gson = new Gson();
+                var str = gson.toJson(MainData.SharedInstance());
+                myWriter.write(str);
+                myWriter.close();
+            }
+
+        } catch (Exception e) {
+            AlertDialog.showMessage(Alert.AlertType.ERROR, null, "Error trying to save the file");
+
+        }
     }
 
     public void goBackAction()
     {
         try {
-            if(AlertDialog.askQuestion(Alert.AlertType.CONFIRMATION, null, "Are you sure you want to go back? The current schedule won't be saved").get() == ButtonType.OK) {
+            var result = AlertDialog.askSave(Alert.AlertType.CONFIRMATION, null, "Do you want to save the current schedule?").get();
+            if(result == ButtonType.YES)
+            {
+                for(int i = 0; i< listOfScheduledMeetings.size(); i++)
+                {
+                    var toSave = listOfScheduledMeetings.get(i);
+                    var fromMain = MainData.SharedInstance().getMeetings().get(toSave.id);
+                    fromMain.nSessio = toSave.sessio;
+                    fromMain.nTaula = toSave.taula;
+                    fromMain.nSlot = toSave.slot;
+                }
+            }
+            if(result == ButtonType.YES || result == ButtonType.NO)
+            {
                 Stage stage = new Stage();
 
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../FXML/create_new.fxml"));

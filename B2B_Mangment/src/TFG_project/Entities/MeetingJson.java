@@ -7,11 +7,17 @@ import java.util.List;
 public class MeetingJson {
     public String sessio;
     public LinkedList<String> listOfParticipants;
+    public int nSessio = -1;
+    public int nSlot = -1;
+    public int nTaula = -1;
 
     public MeetingJson(Meeting ent)
     {
         sessio = ent.getSessio();
         listOfParticipants = ent.getListOfParticipants();
+        nSessio = ent.getNSessio();
+        nSlot = ent.getNSlot();
+        nTaula = ent.getNTaula();
     }
     public MeetingJson(String s, LinkedList<String> meetings)
     {

@@ -92,11 +92,16 @@ public class Sessio {
             double res = ((double)startMinute) / 60;
             if(res >= 1)
             {
+                var exces = startMinute-60;
                 startHour++;
-                res = res-1;
-                startMinute = (int)(res*60);
+                startMinute = exces;
             }
         }
+    }
+
+    public void resetSlots(int duration)
+    {
+        computeSlots(duration);
     }
 
     public void setDebugInfo(int nTotalSlots, int duration, int nTables)

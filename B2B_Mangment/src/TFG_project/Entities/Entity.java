@@ -155,4 +155,37 @@ public class Entity {
             listOfSessions.get(0).getAttendingSet().get(posicio).setR(false);
         }
     }
+
+
+    public void updateNSessions(int newN)
+    {
+        if(newN > listOfSessions.size())
+        {
+            for(int i = listOfSessions.size(); i<newN; i++)
+            {
+                listOfSessions.add(new SessioAttending(MainData.SharedInstance().getSessions().get(i).getSlots()));
+            }
+        }
+        else if(newN< listOfSessions.size())
+        {
+            while(newN < listOfSessions.size())
+                listOfSessions.removeLast();
+        }
+    }
+
+    public void resetSession(int pos, List<String> slots)
+    {
+        listOfSessions.get(pos).resetAttendingSet(slots);
+    }
+
+    public void resetAllSessions()
+    {
+        var mainSessions = MainData.SharedInstance().getSessions();
+        for(int i = 0; i< mainSessions.size();i++)
+        {
+            listOfSessions.get(i).resetAttendingSet(mainSessions.get(i).getSlots());
+        }
+
+    }
+
 }
