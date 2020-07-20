@@ -130,7 +130,7 @@ class ScalAT {
     dimacs.write("p cnf "+vars.toString+" "+nclauses.toString+"\n")
     dimacs.write("1 0\n") //True constant
 
-    val source = Source.fromFile(workingpath+"tmp_pre.dimacs")
+    val source = Source.fromURL("file://" + workingpath+"tmp_pre.dimacs")
     for(line <- source.getLines())
       dimacs.write(line+"\n")
 
@@ -151,7 +151,7 @@ class ScalAT {
       "c propagations",
       "c Total wall clock time")
 
-    val info = io.Source.fromFile(workingpath+"tmp.res").getLines
+    val info = io.Source.fromURL("file://" + workingpath+"tmp.res").getLines
       .filter(s => keys.exists(s.startsWith)).toList
 
     conflicts = info(0).split(":")(1).trim.toInt

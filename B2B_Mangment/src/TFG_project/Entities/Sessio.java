@@ -23,6 +23,8 @@ public class Sessio {
         horaFi = "20:00";
         listOfTables = new HashMap<Integer,TableForSession>();
         listOfTables.put(0,new TableForSession(0,1));
+        //listOfTables.put(2,new TableForSession(2,1));
+        //listOfTables.put(3,new TableForSession(3,1));
 
         slots = new LinkedList<>();
         computeSlots(MainData.SharedInstance().getMeetingsDuration());

@@ -22,12 +22,14 @@ public class AlertDialog {
 
     public static Optional<ButtonType> askQuestion(Alert.AlertType type, String title, String message)
     {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(type);
         if(title != null)
             alert.setTitle(title);
         if(message != null)
             alert.setContentText(message);
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.CANCEL);
         var result = alert.showAndWait();
+
         return result;
     }
 

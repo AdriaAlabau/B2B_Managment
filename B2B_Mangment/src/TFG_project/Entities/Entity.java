@@ -171,6 +171,7 @@ public class Entity {
             while(newN < listOfSessions.size())
                 listOfSessions.removeLast();
         }
+        redoSessionsString();
     }
 
     public void resetSession(int pos, List<String> slots)
@@ -185,7 +186,7 @@ public class Entity {
         {
             listOfSessions.get(i).resetAttendingSet(mainSessions.get(i).getSlots());
         }
-
+        redoSessionsString();
     }
 
 }

@@ -10,10 +10,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox stylesheets="@customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.CONTROLLERS.SetArribalInfo">
+<VBox stylesheets="@../resource/customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.VIEWS.SetArribalInfo">
    <children>
-       <Label style="-fx-font-family: arialBlack;" styleClass="title1" text="Set when the entity will be availa
-       ble">
+       <Label style="-fx-font-family: arialBlack;" styleClass="title1" text="Set when the entity will be available">
            <padding>
                <Insets left="10.0" />
            </padding>

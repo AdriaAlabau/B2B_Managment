@@ -58,7 +58,7 @@ object Encoding {
                 sM: java.util.ArrayList[java.util.ArrayList[Int]],
                 mS: java.util.ArrayList[java.util.ArrayList[Int]],
                 mP: java.util.ArrayList[java.util.ArrayList[Int]],
-                pM: java.util.ArrayList[SimpleClass]) : java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]] = {
+                pM: java.util.ArrayList[SimpleClass], path: String) : java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]] = {
 
 
     val attendesXParticipan = nAP.asScala.toArray
@@ -71,7 +71,7 @@ object Encoding {
     val meetingEntities = convertirJavaAScala(mP)
     val predef = pM.asScala.toArray
 
-    val e = new ScalAT("/Users/adriaalabau/Projects/TFG/","/Users/adriaalabau/Projects/TFG/");
+    val e = new ScalAT(path,path);
 
     //Variables del viewpoint
     val schedule = e.newVar2DArray(nMeetings, nSlots)
@@ -90,7 +90,6 @@ object Encoding {
     //CONSTRAINT 2
     //Una entitat no te reunions en hores marcades que no assistira
 
-    //REVISAR SI FORBIDEN ES CORRECTE
     for (entity <- entityMeetings.indices; forb <- forbidden(entity); meet <- entityMeetings(entity)) {
       e.addClause((-(schedule(meet)(forb))) :: List())
     }
@@ -112,15 +111,7 @@ object Encoding {
     //Per cada slot de temps, les reunions de temps es poden colocar
     for (tSes <- 0 until nSessions; tSlot <- sessioSlots(tSes)) {
       e.addAMK((for (i <- sessioMeetings(tSes)) yield schedule(i)(tSlot)).toList, taulesXSessio(tSes))
-      for(i <- sessioMeetings(tSes))
-        System.out.println(schedule(i)(tSlot))
     }
-
-
-    /*for (tSes <- 0 until nSessions; tSlot <- sessioSlots(tSes)) {
-      val mida = 2
-      (for (meet <- sessioMeetings(tSes) if mettingXParticipant(meet).size <= mida) yield meet).toList
-    }*/
 
     var lRet = new java.util.ArrayList[java.util.ArrayList[java.util.ArrayList[Int]]]()
     //Solucionem
@@ -135,7 +126,6 @@ object Encoding {
           for (meet <- 0 until nMeetings) {
             if (e.getValue(schedule(meet)(tSlot)))
             {
-              System.out.println(schedule(meet)(tSlot))
               slot.add(meet)
             }
           }
