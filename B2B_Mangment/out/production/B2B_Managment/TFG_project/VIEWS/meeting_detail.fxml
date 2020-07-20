@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="mainVBox" minHeight="350.0" minWidth="350.0" style="-fx-background-color: lightGrey;" stylesheets="@../resource/customStyle.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TFG_project.VIEWS.MeetingDetailController">
+    <children>
+        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" style="-fx-font-family: arialBlack;" styleClass="title1" text="Meeting Detail">
+            <padding>
+                <Insets left="10.0" />
+            </padding>
+            <VBox.margin>
+                <Insets bottom="10.0" top="10.0" />
+            </VBox.margin>
+            <font>
+                <Font name="Arial Black" size="14.0" />
+            </font>
+        </Label>
+      <HBox alignment="CENTER_LEFT" minHeight="-Infinity" minWidth="-Infinity" prefHeight="45.0" spacing="15.0" VBox.vgrow="NEVER">
+         <children>
+                <Label text="Select preferred session" />
+            <ChoiceBox fx:id="preferedSessionChoiceBox" prefWidth="150.0" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </HBox>
+      <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: lightGrey;" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox minHeight="150.0" style="-fx-background-color: lightGrey;">
+               <children>
+                  <GridPane fx:id="newMettingsGroup" vgap="5.0">
+                      <columnConstraints>
+                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" />
+                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="320.0" minWidth="150.0" prefWidth="300.0" />
+                      </columnConstraints>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </GridPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+        <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" spacing="15.0" VBox.vgrow="NEVER">
+            <children>
+            <Button mnemonicParsing="false" onAction="#addNewMeeting" prefHeight="27.0" prefWidth="104.0" styleClass="custom_button" text="Add participant" HBox.hgrow="NEVER" />
+            <Pane HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#eraseAction" prefHeight="27.0" prefWidth="70.0" styleClass="custom_red_button" text="Erase" HBox.hgrow="NEVER" />
+                <Button mnemonicParsing="false" onAction="#saveInfoAction" prefHeight="27.0" prefWidth="70.0" styleClass="custom_button" text="Save" HBox.hgrow="NEVER" />
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </HBox>
+    </children>
+</VBox>
